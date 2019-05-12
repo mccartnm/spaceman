@@ -1,0 +1,27 @@
+# Helion
+
+display_name: Helion
+class: A
+mobile: true
+description: A light, fast ship with dual locked hardpoints
+
+hardpoints:
+  - name: Left Armament
+    types: [bullet, miner]
+    location: [13, 18]
+    direction: 0
+    locked: true
+    command: fire1
+    default: Rattler P41
+  - name: Right Armament
+    types: [bullet, miner]
+    location: [49, 18]
+    direction: 0
+    locked: true
+    command: fire1
+    default: Rocko Miner
+
+
+hull: 1000
+shield: 500
+fuel: 120

@@ -1,0 +1,13 @@
+
+
+Spaceman Space Defender Game Thing
+
+Player is cast into the depths of space to explore some odd behaviour going on about the cosmos.
+
+There's loot to find, pirates and factions to kill, ships to steal, and more (eventually)!
+
+Ships are built dynamically* and then fed into the system for drawing and processing.
+
+A ship can have any number hardpoints, which equate to weapons (for now) to use against the forces of evil!
+
+

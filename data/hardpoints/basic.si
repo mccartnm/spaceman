@@ -1,0 +1,18 @@
+# Basic hardponits we know of
+
+- name: Rattler P41
+  description: |
+    Basic machine gun with low damage
+  type: bullet
+  ammo: null
+  damage: 120
+  rate: 10
+
+- name: Rocko Miner
+  description: |
+    Basic mining lazer that will dig up some basic
+    materials from asteroids
+  type: miner
+  ammo: null
+  damage: 120
+  rate: 10
