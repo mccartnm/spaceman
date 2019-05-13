@@ -95,10 +95,12 @@ class _AbstractDrawObject(metaclass=PureVirtualMeta):
         """
         self._z_depth = z
 
-    def default_sprite(self) -> TSprite:
+    def default_sprite(self, texture_dir: str) -> TSprite:
         """
         :return: TSprite
         """
+        # -- Get the texture states
+
         s = TSprite(scale=settings.get_setting('global_scale', 1.0))
         s.center_x = self.position.x
         s.center_y = self.position.y
