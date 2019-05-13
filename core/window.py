@@ -7,6 +7,7 @@ from .player import Player
 from .ship import Ship
 from .abstract import DrawEvent
 from .utils import Position
+from .render import RenderEngine
 
 class Spaceman(arcade.Window):
     """
@@ -50,6 +51,14 @@ class Spaceman(arcade.Window):
     @property
     def hardpoint_data(self):
         return os.path.join(self._data_path, 'hardpoints')
+
+    def setup(self):
+        """
+        """
+        arcade.set_background_color(arcade.color.BLACK)
+
+        self._ship = Ship.new_ship("Skalk", position=Position(250, 230))
+        self._render_engine.add_object(self._ship)
 
     # -- Overloaded interface
     def on_mouse_motion(self, x, y, dx, dy):

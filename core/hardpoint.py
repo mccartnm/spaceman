@@ -135,6 +135,9 @@ class Hardpoint(object):
             ('default', str),
         ])
 
+        if errors:
+            return
+
         if info['default'] not in cls._hardpoint_prototypes:
             errors.append(
                 f'Unknown hardpoint prototype: {info["default"]}'

@@ -18,7 +18,7 @@ class RenderEngine(object):
         return cls._instance
 
     def __init__(self):
-        self._render_laters = {} # Sprite Based
+        self._render_layers = {} # Sprite Based
 
     def add_object(self, obj: _AbstractDrawObject):
         """
@@ -51,7 +51,7 @@ class RenderEngine(object):
         Main render loop
         """
         for i in sorted(self._render_layers.keys()):
-            sprite_list, functional_draw = self._render_layers
+            sprite_list, functional_draw = self._render_layers[i]
 
             # We draw functional items first
             map(lambda x: x.paint(draw_event), functional_draw)

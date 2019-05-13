@@ -7,8 +7,8 @@ from core import window
 def main():
     # resolution = get_setting("resolution")
     game = window.Spaceman(1000, 600, "Space Stuff")
-    # game.setup()
-    # arcade.run()
+    game.setup()
+    arcade.run()
 
 if __name__ == '__main__':
     main()

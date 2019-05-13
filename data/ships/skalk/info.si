@@ -8,19 +8,23 @@ description: A light, fast ship with dual locked hardpoints
 hardpoints:
   - name: Left Armament
     types: [bullet, miner]
-    location: [13, 18]
+    location: [8, 40]
     direction: 0
     locked: true
     command: fire1
     default: Rattler P41
   - name: Right Armament
     types: [bullet, miner]
-    location: [49, 18]
+    location: [55, 40]
     direction: 0
     locked: true
     command: fire1
     default: Rocko Miner
 
+engines:
+    - location: [31, 53]
+      size: w
+      default: fire_bloom_w
 
 hull: 1000
 shield: 500

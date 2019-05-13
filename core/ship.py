@@ -8,6 +8,7 @@ import arcade
 
 from .abstract import _AbstractDrawObject, TSprite
 from .hardpoint import Hardpoint
+from .engine import Engine
 from .utils import _must_contain, Position
 from . import settings
 
@@ -29,6 +30,14 @@ class ShipHardpoint(object):
         # The currently attached hardpoint
         self._hardpoint = None
 
+class ShipEngine(object):
+    """
+    A ship engine 
+    """
+    def __init__(self, info):
+        self._location = info['location']
+        self._size     = info['size']
+        self._default  = info['default']
 
 class Ship(_AbstractDrawObject):
     """
@@ -37,10 +46,12 @@ class Ship(_AbstractDrawObject):
     """
     _ship_prototypes = {}
 
-    def __init__(self, ship_info, data_directory):
+    def __init__(self, ship_info):
         """
         Building a ship takes a good chunk of information
         """
+        super().__init__()
+
         # All the defaults
         self._display_name = ship_info['display_name']
         self._class        = ship_info['class']
@@ -49,12 +60,16 @@ class Ship(_AbstractDrawObject):
         self._hull         = ship_info['hull']
         self._shield       = ship_info['shield']
         self._fuel         = ship_info['fuel']
-        self._hardpoints   = (ShipHardpoint(
-            x for x in ship_info.get('hardpoints', [])
-        ))
 
-        self._sprites = {}
-        self._load_sprites(data_directory)
+        self._hardpoints   = [
+            ShipHardpoint(x) for x in ship_info.get('hardpoints', [])
+        ]
+
+        self._engines      = [
+            ShipEngine(x) for x in ship_info.get('engines', [])
+        ]
+
+        self._data_location = ship_info['data_directory']
 
     @property
     def display_name(self):
@@ -88,12 +103,7 @@ class Ship(_AbstractDrawObject):
         """
         We load the ship for various reasons
         """
-        sprite = self.default_sprite()
-
-        folders = filter(
-            lambda x: os.path.isdir(x), os.listdir(data_location)
-        )        
-
+        return self.default_sprite(self._data_location)
 
     @classmethod
     def new_ship(cls, name: str, position: Position = Position(10, 10)):
@@ -153,6 +163,18 @@ class Ship(_AbstractDrawObject):
                         errors.append("Hardpoint failure:")
                         errors.extend(hp_errors)
 
+        # If there are engines...
+        if 'engines' in info:
+            if not isinstance(info['engines'], list):
+                errors.append("Engines must be a list of dictionaries")
+            else:
+                for engine_info in info['engines']:
+                    engine_errors = []
+                    Engine.verify_ship_engine(engine_info, engine_errors)
+                    if engine_errors:
+                        errors.append("Engine failure:")
+                        errors.extend(engine_errors)
+
         # At a minimum there must be one sprite of "life/static.png"
         path = os.path.join(os.path.dirname(info_file), 'life/static.png')
         if not os.path.isfile(path):
@@ -164,6 +186,7 @@ class Ship(_AbstractDrawObject):
                 f"Could not start game! Loading error on: '{name}'"
             )
 
+        info['data_directory'] = os.path.dirname(info_file)
         cls._ship_prototypes[info['display_name']] = info
 
 

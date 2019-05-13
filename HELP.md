@@ -18,15 +18,15 @@ To get changes that are live:
 
 To add specific file:
 
-    > git clone <filename>
+    > git add <filename>
 
 To add _changes_ (not new files)
 
-    > git clone -u
+    > git add -u
 
 To add _alllll_ files (even new files)
 
-    > git clone -A
+    > git add -A
 
 # Commit
 
@@ -41,3 +41,9 @@ Push the files up to the server
     > git push
 
 (might need your credentials)
+
+# Status
+
+If you want to the see the status of your changes (before you commit)
+
+    > git status
