@@ -8,6 +8,9 @@ from .ship import Ship
 from .abstract import DrawEvent
 from .utils import Position
 from .render import RenderEngine
+from .campaign import CampaignLoader, Campaign
+
+DEV_MODE = True
 
 class Spaceman(arcade.Window):
     """
@@ -27,13 +30,21 @@ class Spaceman(arcade.Window):
 
         # Where we store all of the dynamic game data
         self._data_path = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            os.path.dirname(
+                os.path.dirname(
+                    os.path.dirname(os.path.abspath(__file__))
+                )
+            ),
             'data'
         )
 
         # Initial information
         self._mouse_position = Position(0, 0)
         self._mouse_delta = Position(0, 0)
+
+        # The campaign loading and selection
+        self._camp_loader = CampaignLoader()
+        self._campaign = None # We load this later
 
         # The players active ship
         self._player = Player()
@@ -57,8 +68,9 @@ class Spaceman(arcade.Window):
         """
         arcade.set_background_color(arcade.color.BLACK)
 
-        self._ship = Ship.new_ship("Skalk", position=Position(250, 230))
-        self._render_engine.add_object(self._ship)
+        if DEV_MODE:
+            self._campaign = self._camp_loader.dev_campaign()
+            self._campaign.basic_start(self._player, self)
 
     # -- Overloaded interface
     def on_mouse_motion(self, x, y, dx, dy):

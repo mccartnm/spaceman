@@ -1,7 +1,7 @@
 
 import arcade
 
-from core import window
+from spaceman.core import window
 # from .settings import get_setting
 
 def main():

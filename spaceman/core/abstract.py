@@ -29,6 +29,11 @@ class DrawEvent(object):
 class TSprite(arcade.Sprite):
     """
     Base class for all sprites to work from.
+
+    This class uses the "state" structure to allow for dynamic loading
+    of states when required.
+
+    TODO: Add more documentation
     """
     BASE_STATE = 'life-static' # Required by all sprites
 
@@ -116,6 +121,7 @@ class _AbstractDrawObject(metaclass=PureVirtualMeta):
 
         # The sprite itself
         self._sprite = None
+        self._is_in_scene = False
 
     @property
     def position(self):
@@ -124,6 +130,28 @@ class _AbstractDrawObject(metaclass=PureVirtualMeta):
     @property
     def z_depth(self) -> int:
         return self._z_depth
+
+    @property
+    def is_in_scene(self):
+        return self._is_in_scene
+
+    def add_to_scene(self):
+        """
+        This this object to our scene at the given depth
+        :return: None
+        """
+        from .render import RenderEngine
+        RenderEngine().add_object(self)
+
+    def set_in_scene(self, in_scene: bool):
+        """
+        Set when adding this to the render engine for rendering.
+
+        Unset when we're done with it
+        :param in_scene: Boolean if we're in the scene
+        :return: None
+        """
+        self._is_in_scene = in_scene
 
     def set_position(self, position: Position):
         self._position = position
@@ -139,6 +167,9 @@ class _AbstractDrawObject(metaclass=PureVirtualMeta):
         Set the z position of this item to give the
         render engine an idea of when to draw it
         """
+        if self.is_in_scene:
+            raise RuntimeError("Attempting to change the z-depth while"
+                               " in scene. This is not yet supported")
         self._z_depth = z
 
     def build_states(self, texture_dir: str) -> dict:
