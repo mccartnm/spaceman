@@ -117,6 +117,7 @@ class _AbstractDrawObject(metaclass=PureVirtualMeta):
 
     def __init__(self):
         self._position = Position(0, 0)
+        self._velocity = Position(0, 0)
         self._z_depth = 0
 
         # The sprite itself
@@ -134,6 +135,9 @@ class _AbstractDrawObject(metaclass=PureVirtualMeta):
     @property
     def is_in_scene(self):
         return self._is_in_scene
+
+    def sprite(self):
+        return self._retrieve_sprite_pvt()
 
     def add_to_scene(self):
         """
@@ -171,6 +175,15 @@ class _AbstractDrawObject(metaclass=PureVirtualMeta):
             raise RuntimeError("Attempting to change the z-depth while"
                                " in scene. This is not yet supported")
         self._z_depth = z
+
+    def set_velocity(self, velocty: Position):
+        """
+        Set the speed at which this object is traveling (if any)
+        """
+        self._velocity = velocty
+        if self.draw_method() == _AbstractDrawObject.SPRITE_BASED:
+            self.sprite().change_x = velocty.x
+            self.sprite().change_y = velocty.y
 
     def build_states(self, texture_dir: str) -> dict:
         """
@@ -271,3 +284,13 @@ class _AbstractDrawObject(metaclass=PureVirtualMeta):
         All classes have to overload this
         """
         raise NotImplementedError()
+
+    def update(self, delta_time):
+        """
+        Update this object. If the object is not a sprite, then this
+        does nothing by default.
+        :param delta_time: float of time passed sincle the last update
+        :return: None
+        """
+        if self.draw_method() == _AbstractDrawObject.SPRITE_BASED:
+            self.sprite().update()

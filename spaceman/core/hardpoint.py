@@ -7,8 +7,9 @@ import yaml
 import arcade
 
 from .utils import _must_contain
+from .abstract import _AbstractDrawObject, TSprite
 
-class Hardpoint(object):
+class Hardpoint(_AbstractDrawObject):
     """
     A hardpoint is a single location that can host
     a weapon of some sort
@@ -25,15 +26,18 @@ class Hardpoint(object):
     # -- Known - loaded hardpoint descriptors
     _hardpoint_prototypes = {}
 
-    def __init__(self, info):
+    def __init__(self, info, ship):
         self._name      = info['name']
+        self._ammo      = info['description']
         self._type      = info['type']
-        self._ammo      = info['ammo']
-        self._location  = info['location']
-        self._direction = info['direction']
-        self._locked    = info['locked']
+        self._location  = info['ammo']
         self._damage    = info['damage']
-        self._command   = info['command']
+        self._command   = info['rate']
+        self._ship      = ship
+
+    @classmethod
+    def new_hardpoint(cls, prototype: str, ship):
+        return cls(cls._hardpoint_prototypes[prototype], ship)
 
     @property
     def name(self):
@@ -86,13 +90,13 @@ class Hardpoint(object):
 
         if not isinstance(info, list):
             raise RuntimeError(
-                f"Info for {info_file} must be a list"
+                f"Info for {info_file} must be a list[dict,]"
             )
 
         for hp_info in info:
             if not isinstance(hp_info, dict):
                 raise RuntimeError(
-                    f"Each info for {info_file} must be a list"
+                    f"Each descriptor for {info_file} must be a dict"
                 )
 
             map(lambda x: _must_contain(hp_info, errors, *x), [
@@ -106,9 +110,12 @@ class Hardpoint(object):
 
             n = hp_info.get('name', info_file)
             if errors:
-                print ("ERROR ON: {n}:")
+                print (f"ERROR ON: {n}:")
                 print ("\n".join(errors))
                 raise RuntimeError("Could not start game")
+
+            if n in cls._hardpoint_prototypes:
+                raise RuntimeError(f"Duplicate hardpoint name: {n}! Must be unique!")
 
             cls._hardpoint_prototypes[n] = hp_info
 
@@ -155,3 +162,9 @@ class Hardpoint(object):
         elif any((isinstance(x, int) == False for x in location)):
             errors.append("'location' components should be integers")
 
+    def draw_method(self):
+        return _AbstractDrawObject.PAINT_BASED
+
+    def paint(self, draw_event):
+        """ For now do nothing """
+        pass

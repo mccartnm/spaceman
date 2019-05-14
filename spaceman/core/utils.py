@@ -1,5 +1,12 @@
-
 import arcade
+
+import time
+import collections
+
+from typing import TypeVar
+
+def _clamp(low, val, high):
+    return max(min(val, high), low)
 
 def _must_contain(info: dict, errors: list, *d):
     """
@@ -17,12 +24,13 @@ def _must_contain(info: dict, errors: list, *d):
     elif not isinstance(info[key], is_type):
         errors.append(f"'{key}' wrong type! Should be: {is_type}")
 
+T = TypeVar('T', bound='Position')
 class Position(object):
     """
     Basic (x, y) coordinates with helper functions
     """
 
-    def __init__(self, x: int = 0, y: int = 0):
+    def __init__(self, x: (int, float) = 0, y: (int, float) = 0):
         self.x = x
         self.y = y
 
@@ -32,30 +40,63 @@ class Position(object):
 
     def __sub__(self, other):
         """ Subtractive math """
-        return Position(self.x - x, self.y - y)
+        return Position(self.x - other.x, self.y - other.y)
 
-    def __rsub__(self, val):
-        """ Reference sub, supports both unary and Position values """
-        if isinstance(val, Position):
-            self.x -= val.x
-            self.y -= val.y
-        else:
-            self.x - val
-            self.y - val
-
-    def __add__(self, other):
+    def __add__(self, other: T) -> T:
         """ Additive math """
-        return Position(self.x + x, self.y + y)
+        return Position(self.x + other.x, self.y + other.y)
 
-    def __radd__(self, val):
-        """ Reference add, supports both unary and Position values """
-        if isinstance(val, Position):
-            self.x += val.x
-            self.y += val.y
+    def __repr__(self):
+        return f"<(Position ({self.x}, {self.y}))>"
+
+    def drag_calculation(self, drag: T) -> T:
+        """
+        Basic drag math over a frame
+        """
+        def _d_neg(v, o):
+            return max(v - o, 0.0)
+
+        if self.x > 0:
+            self.x = _d_neg(self.x, drag.x)
+        if self.y > 0:
+            self.y = _d_neg(self.y, drag.y)
+
+        def _d_pos(v, o):
+            return min(v + o, 0.0)
+
+        if self.x < 0:
+            self.x = _d_pos(self.x, drag.x)
+        if self.y < 0:
+            self.y = _d_pos(self.y, drag.y)
+
+        return self
+
+    def clamp(self, minimum: (int, float, T), maximum: (int, float, T)) -> T:
+        """
+        Basic clamping mathmatics
+        :param minimum: Value to stay above for X and Y or a Position to clamp individually
+        :param maximum: Value to stay below for X and Y or a Position to clamp individually
+        :return: self
+        """
+        low_x = 0
+        low_y = 0
+        high_x = 0
+        high_y = 0
+        if isinstance(minimum, Position):
+            low_x = minimum.x
+            low_y = minimum.y
         else:
-            self.x + val
-            self.y + val
+            low_x = low_y = minimum
 
+        if isinstance(maximum, Position):
+            high_x = maximum.x
+            high_y = maximum.y
+        else:
+            high_x = high_y = maximum
+
+        self.x = _clamp(low_x, self.x, high_x)
+        self.y = _clamp(low_y, self.y, high_y)
+        return self
 
 class Depths(object):
     """
@@ -63,3 +104,22 @@ class Depths(object):
     """
     STAR_FIELD = -100
     PLAYER = 0
+
+
+class FPSCounter(object):
+    def __init__(self):
+        self.time = time.perf_counter()
+        self.frame_times = collections.deque(maxlen=60)
+
+    def tick(self):
+        t1 = time.perf_counter()
+        dt = t1 - self.time
+        self.time = t1
+        self.frame_times.append(dt)
+
+    def get_fps(self):
+        total_time = sum(self.frame_times)
+        if total_time == 0:
+            return 0
+        else:
+            return len(self.frame_times) / sum(self.frame_times)

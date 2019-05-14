@@ -38,6 +38,7 @@ class Campaign(object):
         )
         player.ship.add_to_scene()
 
+        # Bit of a performance drag... need to know why
         from ..draw.starfield import Starfield
         self._background = Starfield(window)
         RenderEngine().add_object(self._background)

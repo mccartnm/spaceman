@@ -3,6 +3,7 @@ Base classes for the ships (player or NPC)
 """
 
 import os
+import math
 import yaml
 import arcade
 
@@ -18,7 +19,7 @@ class ShipHardpoint(object):
     with the world in some way (weapons, research, mining, etc)
     """
 
-    def __init__(self, info):
+    def __init__(self, info, ship):
         self._name      = info['name']
         self._types     = info['types']
         self._location  = info['location']
@@ -26,23 +27,28 @@ class ShipHardpoint(object):
         self._locked    = info['locked']
         self._command   = info['command']
         self._default   = info['default']
+        self._ship      = ship
 
         # The currently attached hardpoint
-        self._hardpoint = None
+        self._hardpoint = Hardpoint.new_hardpoint(info['default'], ship)
 
 class ShipEngine(object):
     """
     A ship engine 
     """
-    def __init__(self, info):
+    def __init__(self, info, ship):
         self._location = info['location']
         self._size     = info['size']
         self._default  = info['default']
+        self._ship     = ship 
+
+        # The currently attached engine
+        self._engine = Engine.new_engine(info['default'], ship)
 
 class Ship(_AbstractDrawObject):
     """
     A component that can float/fly in space, has health, can be destroyed,
-    and other fin stuff!
+    and other fun stuff!
     """
     _ship_prototypes = {}
 
@@ -60,16 +66,26 @@ class Ship(_AbstractDrawObject):
         self._hull         = ship_info['hull']
         self._shield       = ship_info['shield']
         self._fuel         = ship_info['fuel']
+        self._max_speed    = ship_info['max_speed']
 
-        self._hardpoints   = [
-            ShipHardpoint(x) for x in ship_info.get('hardpoints', [])
+        self._hardpoints = [
+            ShipHardpoint(x, self) for x in ship_info.get('hardpoints', [])
         ]
 
-        self._engines      = [
-            ShipEngine(x) for x in ship_info.get('engines', [])
+        self._engines = [
+            ShipEngine(x, self) for x in ship_info.get('engines', [])
         ]
 
         self._data_location = ship_info['data_directory']
+
+        # -- Internal Ship details
+        self._thrust = Position()
+        self._speed = Position()
+        self._drag = Position(0.05, 0.05)
+        self._change = Position()
+
+        self._angle_delta = 0.0
+        self._angle = 0.0
 
     @property
     def display_name(self):
@@ -94,6 +110,51 @@ class Ship(_AbstractDrawObject):
     @property
     def hardpoints(self):
         return self._hardpoints
+
+    # -- More typical gameplay controls
+
+    @property
+    def thrust(self):
+        return self._thrust
+
+    def set_thrust(self, thrust: Position):
+        self._thrust = thrust
+
+    @property
+    def angle_delta(self):
+        return self._angle_delta
+    
+    def set_angle_delta(self, delta):
+        self._angle_delta = delta
+
+    # -- Overloaded update
+
+    def update(self, draw_event):
+        """
+        The ship piloting logic goes in herew
+        
+        :note: We work in 2 dimentions with nealy everything here
+        """
+        self._speed.drag_calculation(self._drag)
+
+        self._speed += self._thrust
+        self._speed.clamp(-self._max_speed, self._max_speed)
+
+        self._angle += self.angle_delta
+        self._change.x = -math.sin(math.radians(self._angle)) * self._speed.y
+        self._change.y = math.cos(math.radians(self._angle)) * self._speed.y
+
+        self._change.x += -math.sin(math.radians(self._angle + 90)) * self._speed.x
+        self._change.y += math.cos(math.radians(self._angle + 90)) * self._speed.x
+
+        s = self.sprite()
+        s.center_x += self._change.x
+        s.center_y += self._change.y
+        s.angle = self._angle
+
+        super().update(draw_event)
+
+    # -- Base Class Requirements
 
     def draw_method(self):
         """ This is a sprite based object """
@@ -149,6 +210,7 @@ class Ship(_AbstractDrawObject):
             ('hull', int),
             ('shield', int),
             ('fuel', int),
+            ('max_speed', float),
         ])
 
         # If there are hardpoints...
@@ -188,17 +250,3 @@ class Ship(_AbstractDrawObject):
 
         info['data_directory'] = os.path.dirname(info_file)
         cls._ship_prototypes[info['display_name']] = info
-
-
-    def _load_sprites(self, data_location):
-        """
-        Find the various sprites that we're want to load.
-        Because we do all sprite requests dynamically
-        :param data_location: The root location of the files that
-        we want to use
-        :return: None
-        """
-
-
-        # "Life" setup
-        # for 

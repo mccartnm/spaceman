@@ -1,0 +1,5 @@
+# Stock engines
+
+- name: Rock Hopper
+  power: 3
+  sprite: fire_bloom_w

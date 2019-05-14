@@ -2,11 +2,13 @@
 import arcade
 
 from spaceman.core import window
-# from .settings import get_setting
+from spaceman.core.settings import get_setting, set_setting
+
+set_setting('global_scale', 1.5)
 
 def main():
-    # resolution = get_setting("resolution")
-    game = window.Spaceman(1000, 600, "Space Stuff")
+    resolution = get_setting("resolution", (1200, 800))
+    game = window.Spaceman(*resolution, "Space Stuff")
     game.setup()
     arcade.run()
 
