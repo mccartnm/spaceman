@@ -23,10 +23,10 @@ hardpoints:
 
 engines:
     - location: [31, 53]
+      direction: s
       size: w
       default: Rock Hopper
 
 hull: 1000
 shield: 500
 fuel: 120
-max_speed: 4

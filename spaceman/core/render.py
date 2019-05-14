@@ -38,9 +38,10 @@ class RenderEngine(object):
             # This object is sprite based - we'll add it to our sprite
             # load for that depth. This way we can draw them in batches
             #
+            sprite = obj._retrieve_sprite_pvt()
             self._render_layers.setdefault(
                 obj.z_depth, [arcade.SpriteList(), []]
-            )[0].append(obj._retrieve_sprite_pvt())
+            )[0].append(sprite)
 
         else:
             #

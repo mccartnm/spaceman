@@ -6,15 +6,18 @@ import os
 import math
 import yaml
 import arcade
+import functools
 
 from .abstract import _AbstractDrawObject, TSprite
 from .hardpoint import Hardpoint
 from .engine import Engine
-from .utils import _must_contain, Position
+from .utils import _must_contain, Position, emap
 from . import settings
 
 class ShipHardpoint(object):
     """
+    Proxy object for a Hardpoint that it set on the ship
+
     A ship hardpoint can hold onto a Hardpoint object to interact
     with the world in some way (weapons, research, mining, etc)
     """
@@ -29,12 +32,23 @@ class ShipHardpoint(object):
         self._default   = info['default']
         self._ship      = ship
 
-        # The currently attached hardpoint
-        self._hardpoint = Hardpoint.new_hardpoint(info['default'], ship)
+        # The currently attached hardpoint (Set to default)
+        self._hardpoint = None
+        if self._default:
+            self._hardpoint = Hardpoint.new_hardpoint(self._default, info, ship)
+
+    def __getattr__(self, attr):
+        """
+        We reroute requests we don't have the answer for to our engine
+        """
+        if self._hardpoint:
+            return getattr(self._hardpoint, attr)
+        raise RuntimeError(f"Unknown engine property: {key}")
+
 
 class ShipEngine(object):
     """
-    A ship engine 
+    Proxy object for an Engine that it set on the ship
     """
     def __init__(self, info, ship):
         self._location = info['location']
@@ -43,13 +57,33 @@ class ShipEngine(object):
         self._ship     = ship 
 
         # The currently attached engine
-        self._engine = Engine.new_engine(info['default'], ship)
+        self._engine = Engine.new_engine(info['default'], info, ship)
+
+    def __getattr__(self, attr):
+        """
+        We reroute requests we don't have the answer for to our engine
+        """
+        if self._engine:
+            return getattr(self._engine, attr)
+        raise RuntimeError(f"Unknown engine property: {key}")
+
 
 class Ship(_AbstractDrawObject):
     """
     A component that can float/fly in space, has health, can be destroyed,
     and other fun stuff!
     """
+
+    #
+    # How heavy is our ship? Heavier ships require more power in the engines to go faster
+    # 
+    WEIGHT_CLASS = {
+        'A' : 1,
+        'B' : 2,
+        'C' : 3,
+        'D' : 4,
+    }
+
     _ship_prototypes = {}
 
     def __init__(self, ship_info):
@@ -66,7 +100,6 @@ class Ship(_AbstractDrawObject):
         self._hull         = ship_info['hull']
         self._shield       = ship_info['shield']
         self._fuel         = ship_info['fuel']
-        self._max_speed    = ship_info['max_speed']
 
         self._hardpoints = [
             ShipHardpoint(x, self) for x in ship_info.get('hardpoints', [])
@@ -111,6 +144,10 @@ class Ship(_AbstractDrawObject):
     def hardpoints(self):
         return self._hardpoints
 
+    @property
+    def angle(self):
+        return self._angle
+
     # -- More typical gameplay controls
 
     @property
@@ -120,12 +157,28 @@ class Ship(_AbstractDrawObject):
     def set_thrust(self, thrust: Position):
         self._thrust = thrust
 
+        if self._thrust.y > 0:
+            emap(lambda x: x.engage(), self._engines)
+        else:
+            emap(lambda x: x.disengage(), self._engines)
+
     @property
     def angle_delta(self):
         return self._angle_delta
     
     def set_angle_delta(self, delta):
         self._angle_delta = delta
+
+    def max_speed(self):
+        """
+        Calculate the max speed of this vessel based on the current
+        engine power and it's class
+        """
+        total_power = functools.reduce(
+            lambda x, y: x.power + y.power, self._engines
+        ) if len(self._engines) > 1 else self._engines[0].power
+
+        return total_power / Ship.WEIGHT_CLASS[self._class]
 
     # -- Overloaded update
 
@@ -138,7 +191,8 @@ class Ship(_AbstractDrawObject):
         self._speed.drag_calculation(self._drag)
 
         self._speed += self._thrust
-        self._speed.clamp(-self._max_speed, self._max_speed)
+        ms = self.max_speed()
+        self._speed.clamp(-ms, ms)
 
         self._angle += self.angle_delta
         self._change.x = -math.sin(math.radians(self._angle)) * self._speed.y
@@ -150,9 +204,14 @@ class Ship(_AbstractDrawObject):
         s = self.sprite()
         s.center_x += self._change.x
         s.center_y += self._change.y
-        s.angle = self._angle
+        s.angle = int(self._angle)
+        self.set_position(Position(s.center_x, s.center_y))
 
         super().update(draw_event)
+
+        # Update all the components as well
+        emap(lambda x: x.update(draw_event), self._hardpoints)
+        emap(lambda x: x.update(draw_event), self._engines)
 
     # -- Base Class Requirements
 
@@ -202,16 +261,18 @@ class Ship(_AbstractDrawObject):
             # We can't load anything else
             raise RuntimeError(f"Info for {name} must be a dictionary")
 
-        map(lambda x: _must_contain(info, errors, *x), [
+        emap(lambda x: _must_contain(info, errors, *x), [
             ('display_name', str),
             ('class', str),
             ('description', str),
             ('mobile', bool),
             ('hull', int),
             ('shield', int),
-            ('fuel', int),
-            ('max_speed', float),
+            ('fuel', int)
         ])
+
+        if not info['class'] in cls.WEIGHT_CLASS:
+            errors.append(f"Weigth class: '{info['class']}' not known!")
 
         # If there are hardpoints...
         if 'hardpoints' in info:

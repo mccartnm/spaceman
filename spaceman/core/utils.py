@@ -8,6 +8,16 @@ from typing import TypeVar
 def _clamp(low, val, high):
     return max(min(val, high), low)
 
+def emap(predicate, iterable):
+    """
+    Pyhton 3 evaluates lazy. Which is cool. But we don't always want that
+
+    We do this in a for loop to take advantage of the memory benefits rather
+    than storing everyhting in a list.
+    """
+    for foo in map(predicate, iterable):
+        pass
+
 def _must_contain(info: dict, errors: list, *d):
     """
     For yaml validation, we use this function a _lot_
@@ -30,9 +40,13 @@ class Position(object):
     Basic (x, y) coordinates with helper functions
     """
 
-    def __init__(self, x: (int, float) = 0, y: (int, float) = 0):
-        self.x = x
-        self.y = y
+    def __init__(self, x: (int, float, tuple, list) = [0, 0], y: (int, float, type(None)) = None):
+        if y is None:
+            self.x = x[0]
+            self.y = x[1]
+        else:
+            self.x = x
+            self.y = y
 
     def __eq__(self, other):
         """ Equatative math """
@@ -46,6 +60,12 @@ class Position(object):
         """ Additive math """
         return Position(self.x + other.x, self.y + other.y)
 
+    def __mul__(self, other: (int, float, T)) -> T:
+        """ Multiplication """
+        if isinstance(other, Position):
+            return Position(self.x * other.x, self.y * other.y)
+        return Position(self.x * other, self.y * other)
+        
     def __repr__(self):
         return f"<(Position ({self.x}, {self.y}))>"
 

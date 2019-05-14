@@ -6,7 +6,7 @@ import os
 import yaml
 import arcade
 
-from .utils import _must_contain
+from .utils import _must_contain, emap
 from .abstract import _AbstractDrawObject, TSprite
 
 class Hardpoint(_AbstractDrawObject):
@@ -26,18 +26,20 @@ class Hardpoint(_AbstractDrawObject):
     # -- Known - loaded hardpoint descriptors
     _hardpoint_prototypes = {}
 
-    def __init__(self, info, ship):
-        self._name      = info['name']
-        self._ammo      = info['description']
-        self._type      = info['type']
-        self._location  = info['ammo']
-        self._damage    = info['damage']
-        self._command   = info['rate']
+    def __init__(self, hardpoint_info, ship_hardpoint_info, ship):
+        super().__init__()
+        self._name      = hardpoint_info['name']
+        self._ammo      = hardpoint_info['description']
+        self._type      = hardpoint_info['type']
+        self._location  = hardpoint_info['ammo']
+        self._damage    = hardpoint_info['damage']
+        self._command   = hardpoint_info['rate']
+        self._ship_hi   = ship_hardpoint_info
         self._ship      = ship
 
     @classmethod
-    def new_hardpoint(cls, prototype: str, ship):
-        return cls(cls._hardpoint_prototypes[prototype], ship)
+    def new_hardpoint(cls, prototype: str, sinfo: dict, ship):
+        return cls(cls._hardpoint_prototypes[prototype], sinfo, ship)
 
     @property
     def name(self):
@@ -99,7 +101,7 @@ class Hardpoint(_AbstractDrawObject):
                     f"Each descriptor for {info_file} must be a dict"
                 )
 
-            map(lambda x: _must_contain(hp_info, errors, *x), [
+            emap(lambda x: _must_contain(hp_info, errors, *x), [
                 ('name', str),
                 ('description', str),
                 ('type', str),
@@ -132,14 +134,14 @@ class Hardpoint(_AbstractDrawObject):
             errors.append(f"Hardpoint should be a dictionary!")
             return
 
-        map(lambda x: _must_contain(info, errors, *x), [
+        emap(lambda x: _must_contain(info, errors, *x), [
             ('name', str),
             ('types', list),
-            ('location', str),
+            ('location', list),
             ('direction', (int, float)),
             ('locked', (int, float)),
             ('command', str),
-            ('default', str),
+            ('default', (str, type(None))),
         ])
 
         if errors:
