@@ -1,9 +1,12 @@
-# Basic hardponits we know of
+# Basic hardponits we can use
 
 - name: Rattler P41
   description: |
     Basic machine gun with low damage
   type: bullet
+  props:
+    sprite: basic_bullet
+    automatic: true
   ammo: null
   damage: 120
   rate: 10
@@ -15,4 +18,4 @@
   type: miner
   ammo: null
   damage: 120
-  rate: 10
+  rate: 25

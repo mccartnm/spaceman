@@ -16,12 +16,13 @@ class Hardpoint(_AbstractDrawObject):
     """
 
     # The various types of hardpoints we support
-    BULLET = 'bullet'
-    LAZER = 'lazer'
-    BOMB = 'bomb'
+    BULLET  = 'bullet'
+    LAZER   = 'lazer'
+    BOMB    = 'bomb'
     MISSILE = 'missile'
-    MINER = 'miner'
-    HARDPONT_TYPES = (BULLET, LAZER, BOMB, MISSILE, MINER)
+    MINER   = 'miner'
+    UTILITY = 'utility'
+    HARDPONT_TYPES = (BULLET, LAZER, BOMB, MISSILE, MINER, UTILITY)
 
     # -- Known - loaded hardpoint descriptors
     _hardpoint_prototypes = {}
@@ -36,6 +37,13 @@ class Hardpoint(_AbstractDrawObject):
         self._command   = hardpoint_info['rate']
         self._ship_hi   = ship_hardpoint_info
         self._ship      = ship
+
+        # For items that are "on/off" e.g. lazers, miner,
+        # automatic bullets, etc
+        self._on = False
+
+    def __repr__(self):
+        return f"<(Hardpoint, {self._name})>"
 
     @classmethod
     def new_hardpoint(cls, prototype: str, sinfo: dict, ship):
@@ -72,6 +80,20 @@ class Hardpoint(_AbstractDrawObject):
     @property
     def command(self):
         return self._command
+
+    def fire(self):
+        """
+        If possible - use this item.
+
+        For projectiles, we check our ships ammo (unless the ammo type is None)
+
+        For things like lazers/utlity items, they will consume energy when used
+        unless they are passives.
+        """
+        if self._type == Hardpoint.BULLET:
+            # A projectile with a b-line path
+            pass
+
 
     @classmethod
     def add_info_file(cls, info_file: str, info_dir: str):

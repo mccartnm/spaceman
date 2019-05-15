@@ -70,6 +70,13 @@ class Player(object):
             self.ship.set_angle_delta(self.ship.angle_delta + 3)
         elif key == arcade.key.D:
             self.ship.set_angle_delta(self.ship.angle_delta - 3)
+
+        # Fire/Utility Controls
+        elif key == arcade.key.SPACE:
+            self.ship.fire_command('fire1')
+        elif key >= arcade.key.KEY_1 and key <= arcade.key.KEY_9:
+            self.ship.fire_command(f'util{key - arcade.key.KEY_0}')
+
         else:
             consumed = False
 

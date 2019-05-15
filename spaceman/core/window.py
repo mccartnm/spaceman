@@ -64,6 +64,10 @@ class Spaceman(arcade.Window):
         if DEV_MODE:
             self._fps = FPSCounter()
 
+    @property
+    def data_path(self):
+        return self._data_path
+
     def setup(self):
         """
         We setup the game!

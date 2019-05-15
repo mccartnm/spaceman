@@ -23,27 +23,35 @@ class ShipHardpoint(object):
     """
 
     def __init__(self, info, ship):
-        self._name      = info['name']
-        self._types     = info['types']
-        self._location  = info['location']
-        self._direction = info['direction']
-        self._locked    = info['locked']
-        self._command   = info['command']
-        self._default   = info['default']
-        self._ship      = ship
+        # self._name      = info['name']
+        # self._types     = info['types']
+        # self._location  = info['location']
+        # self._direction = info['direction']
+        # self._locked    = info['locked']
+        # self._command   = info['command']
+        # self._default   = info['default']
+        self._info = info
+        self._ship = ship
 
         # The currently attached hardpoint (Set to default)
         self._hardpoint = None
-        if self._default:
-            self._hardpoint = Hardpoint.new_hardpoint(self._default, info, ship)
+        if self.default:
+            self._hardpoint = Hardpoint.new_hardpoint(self.default, info, ship)
 
     def __getattr__(self, attr):
         """
         We reroute requests we don't have the answer for to our engine
         """
+        if attr in self._info:
+            return self._info[attr]
+
         if self._hardpoint:
             return getattr(self._hardpoint, attr)
-        raise RuntimeError(f"Unknown engine property: {key}")
+        raise RuntimeError(f"Unknown engine property: {attr}")
+
+    @property
+    def hardpoint(self):
+        return self._hardpoint
 
 
 class ShipEngine(object):
@@ -51,10 +59,11 @@ class ShipEngine(object):
     Proxy object for an Engine that it set on the ship
     """
     def __init__(self, info, ship):
-        self._location = info['location']
-        self._size     = info['size']
-        self._default  = info['default']
-        self._ship     = ship 
+        # self._location = info['location']
+        # self._size     = info['size']
+        # self._default  = info['default']
+        self._info = info
+        self._ship = ship
 
         # The currently attached engine
         self._engine = Engine.new_engine(info['default'], info, ship)
@@ -63,9 +72,16 @@ class ShipEngine(object):
         """
         We reroute requests we don't have the answer for to our engine
         """
+        if attr in self._info:
+            return self._info[attr]
+
         if self._engine:
             return getattr(self._engine, attr)
-        raise RuntimeError(f"Unknown engine property: {key}")
+        raise RuntimeError(f"Unknown engine property: {attr}")
+
+    @property
+    def engine(self):
+        return self._engine
 
 
 class Ship(_AbstractDrawObject):
@@ -75,7 +91,8 @@ class Ship(_AbstractDrawObject):
     """
 
     #
-    # How heavy is our ship? Heavier ships require more power in the engines to go faster
+    # How heavy is our ship? Heavier ships require more power in the engines
+    # to go the same speed as smaller class ships
     # 
     WEIGHT_CLASS = {
         'A' : 1,
@@ -149,6 +166,20 @@ class Ship(_AbstractDrawObject):
         return self._angle
 
     # -- More typical gameplay controls
+
+    def fire_command(self, command):
+        """
+        Used to interact with hardpoints or other abilities.
+
+        :param command: The action that we're taking
+        :return: None
+        """
+        for sh in self._hardpoints:
+            if not sh.hardpoint:
+                continue
+
+            if sh.command == command:
+                sh.fire()
 
     @property
     def thrust(self):
@@ -268,7 +299,8 @@ class Ship(_AbstractDrawObject):
             ('mobile', bool),
             ('hull', int),
             ('shield', int),
-            ('fuel', int)
+            ('fuel', int),
+            ('base_power', (int, float)),
         ])
 
         if not info['class'] in cls.WEIGHT_CLASS:

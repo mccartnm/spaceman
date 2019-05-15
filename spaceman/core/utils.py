@@ -35,6 +35,7 @@ def _must_contain(info: dict, errors: list, *d):
         errors.append(f"'{key}' wrong type! Should be: {is_type}")
 
 T = TypeVar('T', bound='Position')
+
 class Position(object):
     """
     Basic (x, y) coordinates with helper functions
