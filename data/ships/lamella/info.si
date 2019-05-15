@@ -1,0 +1,33 @@
+# Lamella
+
+display_name: Lamella
+class: A
+mobile: true
+description: A short wide ship with two hard points. Incredible fast, and with high focus head beams. Steals missions and blinding ops on spy runs is its mo
+
+hardpoints:
+  - name: Left Wing Attachment
+    types: [bullet, miner]
+    location: [8, 40]
+    direction: 0
+    locked: true
+    command: fire1
+    default: Rattler P41
+  - name: Right Wing Attachment
+    types: [bullet, miner]
+    location: [55, 40]
+    direction: 0
+    locked: true
+    command: util1
+    default: Rocko Miner
+
+engines:
+    - location: [11, 26]
+      direction: s
+      size: w
+      default: Rock Hopper
+
+hull: 1000
+shield: 500
+fuel: 120
+base_power: 50.0
