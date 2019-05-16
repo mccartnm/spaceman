@@ -8,6 +8,8 @@ import yaml
 import arcade
 import math
 
+import numpy
+
 from . import settings
 from .utils import _must_contain, Position, emap
 from .abstract import _AbstractDrawObject, TSprite
@@ -164,31 +166,9 @@ class Engine(_AbstractDrawObject):
 
     def load_sprite(self):
         """
-        We need to go load our sprite
+        Load our sprite and put it wherever it's supposed to be
         """
-        scale = settings.get_setting('global_scale', 1.0)
-
-        textures = []
-        if os.path.isfile(self._sprite_path):
-            textures.append(arcade.load_texture(eg_info['sprite'], scale=scale))
-        else:
-            # This should be a directory
-            base = os.path.basename(self._sprite_path)
-            for filename in sorted(os.listdir(self._sprite_path)):
-                if re.match(r'^' + base + r'_[\d]+\.png$', filename):
-                    # This is a valid animated frame
-                    textures.append(arcade.load_texture(
-                        os.path.join(self._sprite_path, filename),
-                        scale=scale
-                    ))
-
-        # For now, we'll just have life-static as a state. We may
-        # want to think about this a bit more for the future
-        states = {
-            'life-static' : textures
-        }
-
-        s = TSprite(states, scale=scale)
+        s = self.load_basic(*os.path.split(self._sprite_path))
         s.center_x = self.position.x
         s.center_y = self.position.y
         return s
@@ -216,9 +196,7 @@ class Engine(_AbstractDrawObject):
         # This should always be the same
         s.angle = int(self._ship.angle)
 
-
-        offset = Position()
-
+        # FIXME: This could be cached 
         this_location = Position(self._ship_ei['location']) * scale
         ship_center = Position(
             ship_sprite.width / 2,
@@ -229,8 +207,16 @@ class Engine(_AbstractDrawObject):
             s.height / 2,
             s.height / 2
         )
-
         relative_location = this_location - ship_center
+        # -- End FIXME
+
+        rads = math.radians(self._ship.angle)
+
+        mat = numpy.array([
+            [math.cos(rads), -math.sin(rads), self._ship.position.x],
+            [math.sin(rads), math.cos(rads),  self._ship.position.y],
+            [0,              0,               1]
+        ])
 
         if self._ship_ei['direction'] == 's':
             relative_location.y += this_sprite_center.y
@@ -238,19 +224,8 @@ class Engine(_AbstractDrawObject):
             if self._ship_ei['size'] == 'w':
                 relative_location.x += 1
 
-        #
-        # Before we set the engine alight we have to account for the
-        # angle the ship is currently at.
-        #
-
-        radius = math.sqrt(math.pow(relative_location.x, 2) + math.pow(relative_location.y, 2))
-
-        # This math is rough at best. But we need to augment based on the relative
-        # distance
-        relative_location.x -= radius * math.cos(math.radians(self._ship.angle - 90))
-        relative_location.y = radius * math.sin(math.radians(self._ship.angle + 90))
-
-        self.set_position(self._ship.position - relative_location)
+        a = numpy.matmul(mat, [relative_location.x, -relative_location.y, 1])
+        self.set_position(Position(a[0], a[1]))
 
         s.center_x = int(self.position.x)
         s.center_y = int(self.position.y)

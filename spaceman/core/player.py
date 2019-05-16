@@ -20,7 +20,6 @@ class Player(object):
         # Mapping to help with key release management
         self._pressed_keys = set()
 
-
     @property
     def ship(self):
         return self._ship

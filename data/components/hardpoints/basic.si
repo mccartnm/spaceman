@@ -6,7 +6,8 @@
   type: bullet
   props:
     sprite: basic_bullet
-    automatic: true
+    automatic: false
+  range: 350
   ammo: null
   damage: 120
   rate: 10
@@ -17,5 +18,6 @@
     materials from asteroids
   type: miner
   ammo: null
+  range: 350
   damage: 120
   rate: 25

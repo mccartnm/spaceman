@@ -4,10 +4,14 @@ Class for handling hardpoints and weapons
 
 import os
 import yaml
+import math
+import numpy
 import arcade
 
-from .utils import _must_contain, emap
+from . import settings
+from .utils import _must_contain, emap, Position
 from .abstract import _AbstractDrawObject, TSprite
+from .projectile import Bullet
 
 class Hardpoint(_AbstractDrawObject):
     """
@@ -35,12 +39,17 @@ class Hardpoint(_AbstractDrawObject):
         self._location  = hardpoint_info['ammo']
         self._damage    = hardpoint_info['damage']
         self._command   = hardpoint_info['rate']
+        self._range     = hardpoint_info['range']
+        self._props     = hardpoint_info.get('props', {})
         self._ship_hi   = ship_hardpoint_info
         self._ship      = ship
 
         # For items that are "on/off" e.g. lazers, miner,
         # automatic bullets, etc
         self._on = False
+        self._tick_delta = 0
+
+        self._children = set()
 
     def __repr__(self):
         return f"<(Hardpoint, {self._name})>"
@@ -81,19 +90,53 @@ class Hardpoint(_AbstractDrawObject):
     def command(self):
         return self._command
 
+    @property
+    def angle(self):
+        return self._ship.angle # This will change
+
     def fire(self):
         """
         If possible - use this item.
 
-        For projectiles, we check our ships ammo (unless the ammo type is None)
+        For projectiles, we check our ships ammo (unless the ammo type
+        is None)
 
-        For things like lazers/utlity items, they will consume energy when used
-        unless they are passives.
+        For things like lazers/utlity items, they will consume energy
+        when used unless they are passives.
         """
         if self._type == Hardpoint.BULLET:
             # A projectile with a b-line path
-            pass
+            if self._props.get('automatic', False):
+                self._on = True
+                self._tick_delta = 0
+            else:
+                self._fire()
 
+    def _fire(self):
+        """
+        Internal call that's used when we run an update (every n frames
+        depending on select factors)
+        """
+        if self._type == Hardpoint.BULLET:
+
+            # TODO: Ammunition from inventory
+
+            bullet = Bullet(
+                self._props.get('sprite', 'basic_bullet'),
+                self._damage,
+                self.position,
+                self._range,
+                self
+            )
+            bullet.add_to_scene()
+            self._children.add(bullet)
+
+    def remove_child(self, child):
+        """
+        Evict a child from our listing
+        """
+        if child in self._children:
+            self._children.remove(child)
 
     @classmethod
     def add_info_file(cls, info_file: str, info_dir: str):
@@ -131,6 +174,9 @@ class Hardpoint(_AbstractDrawObject):
                 ('damage', (int, float)),
                 ('rate', (int, float)),
             ])
+
+            if 'props' in hp_info and not isinstance(hp_info['props'], dict):
+                errors.append(f"'props' of hardpoint must be a dict")
 
             n = hp_info.get('name', info_file)
             if errors:
@@ -192,3 +238,51 @@ class Hardpoint(_AbstractDrawObject):
     def paint(self, draw_event):
         """ For now do nothing """
         pass
+
+    def update(self, delta_time):
+        """
+        Update outselves and any children
+        """
+
+        if not self._ship:
+            return # Nothing to draw yet
+
+        if self._on:
+            # If we're "automatic" - check to seee if we need to fire this
+            # item
+            pass
+
+        #
+        # Just like out engines - we have to place outselves relative
+        # to the craft
+        #
+        scale = settings.get_setting('global_scale', 1.0)
+
+        ship_sprite = self._ship.sprite()
+
+        this_location = Position(self._ship_hi['location']) * scale
+        ship_center = Position(
+            ship_sprite.width / 2,
+            ship_sprite.height / 2
+        )
+
+        relative_location = this_location - ship_center
+
+        rads = math.radians(self._ship.angle)
+        mat = numpy.array([
+            [math.cos(rads), -math.sin(rads), self._ship.position.x],
+            [math.sin(rads), math.cos(rads),  self._ship.position.y],
+            [0,              0,               1]
+        ])
+
+        a = numpy.matmul(mat, [relative_location.x, -relative_location.y, 1])
+        self.set_position(Position(a[0], a[1]))
+
+        super().update(delta_time) # Update ourselves
+
+        # Update any "children"
+        staged_for_removal = set()
+        for child in self._children:
+            if not child.update(delta_time):
+                staged_for_removal.add(child)
+        emap(lambda x: self.remove_child(x), staged_for_removal)

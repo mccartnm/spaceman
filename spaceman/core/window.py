@@ -15,6 +15,8 @@ from .render import RenderEngine
 from .campaign import CampaignLoader, Campaign
 from .component import ComponentManager
 
+from ..interface.user import UserInterface
+
 DEV_MODE = True
 ONCE_FLAG = False
 
@@ -57,6 +59,8 @@ class Spaceman(arcade.Window):
         # The players active ship
         self._player = Player()
 
+        # The interface for the user's current health and otherwise
+        self._interface = UserInterface(self._player)
 
         # Get the render engine
         self._render_engine = RenderEngine()
@@ -73,7 +77,7 @@ class Spaceman(arcade.Window):
         We setup the game!
         """
         arcade.set_background_color(arcade.color.BLACK)
-        arcade.draw_text("Loading...", 10, 10, arcade.color.WHITE, 12)
+        # arcade.draw_text("Loading...", 10, 10, arcade.color.WHITE, 12)
 
         # Step 1!
         self._component_manager.load()
@@ -81,6 +85,8 @@ class Spaceman(arcade.Window):
         if DEV_MODE:
             self._campaign = self._camp_loader.dev_campaign()
             self._campaign.basic_start(self._player, self)
+
+        self._interface.show()
 
     # -- Overloaded interface
 

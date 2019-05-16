@@ -49,6 +49,11 @@ class Position(object):
             self.x = x
             self.y = y
 
+    def __iter__(self):
+        """ Allows for dynamic unpacking (e.g. *pos) """
+        for i in (self.x, self.y):
+            yield i
+
     def __eq__(self, other):
         """ Equatative math """
         return self.x == other.x and self.y == other.y
@@ -118,6 +123,44 @@ class Position(object):
         self.x = _clamp(low_x, self.x, high_x)
         self.y = _clamp(low_y, self.y, high_y)
         return self
+
+class Rect(object):
+    """
+    A rectangle in space somewhere
+    """
+    def __init__(self,
+                 x: (int, float, tuple, list) = (0, 0, 0, 0),
+                 y: (int, float) = 0,
+                 w: (int, float) = 0,
+                 h: (int, float) = 0):
+        if isinstance(x, (list, tuple)):
+            self.x = x[0]
+            self.y = x[1]
+            self.w = x[2]
+            self.h = x[3]
+        else:
+            self.x = x
+            self.y = y
+            self.w = w
+            self.h = h
+
+    def to_arcade_rect(self):
+        """
+        Python arcade uses the center of the rect to understand
+        where we want to draw it.
+        :return: Rect
+        """
+        c = self.center()
+        return Rect(c.x, c.y, self.w, self.h)
+
+    def center(self):
+        return Position(self.x + (self.w / 2), self.y + (self.h / 2))
+
+    def __iter__(self):
+        """ Allows for dynamic unpacking (e.g. *rect) """
+        for i in (self.x, self.y, self.w, self.h):
+            yield i
+
 
 class Depths(object):
     """

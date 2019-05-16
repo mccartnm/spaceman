@@ -54,6 +54,10 @@ class TSprite(arcade.Sprite):
     def set_frame_rate(self, frames):
         self._texture_change_frames = frames
 
+    def set_position(self, position: Position):
+        self.center_x = position.x
+        self.center_y = position.y
+
     @property
     def state(self):
         return self._state
@@ -65,7 +69,11 @@ class TSprite(arcade.Sprite):
         return self._states[self._state]
 
     def current_state_is_animated(self):
-        return isinstance(self.get_state_info(), list)
+        """
+        :return: There are multiple textures to this sprite
+        """
+        si = self.get_state_info()
+        return isinstance(si, list) and len(si) > 1
 
     def set_sprite_state(self, state: str):
         """
@@ -96,7 +104,7 @@ class TSprite(arcade.Sprite):
         super().update()
 
         state_info = self.get_state_info()
-        if isinstance(state_info, list):
+        if isinstance(state_info, list) and len(state_info) > 1:
             # Animation!
             if self._frame % self._texture_change_frames == 0:
                 self._texture_index += 1
@@ -110,8 +118,11 @@ class _AbstractDrawObject(metaclass=PureVirtualMeta):
     """
     Any drawable object or structure should derive from this
     """
-    SPRITE_BASED = 0
-    PAINT_BASED  = 1
+
+    # Bitwise flags to allow for sprite _and_ paint-based objects
+    SPRITE_BASED = 0x00000001
+    PAINT_BASED  = 0x00000010
+    SHAPE_BASED  = 0x00000100
 
     ANIM_REGEX = re.compile(r"^(?P<name>.+)_(?P<frame>\d+)\.png$")
 
@@ -146,6 +157,10 @@ class _AbstractDrawObject(metaclass=PureVirtualMeta):
         """
         from .render import RenderEngine
         RenderEngine().add_object(self)
+
+    def remove_from_scene(self):
+        from .render import RenderEngine
+        RenderEngine().unload_object(self)
 
     def set_in_scene(self, in_scene: bool):
         """
@@ -241,6 +256,35 @@ class _AbstractDrawObject(metaclass=PureVirtualMeta):
 
         return states
 
+    def load_basic(self, texture_dir: str, name: str) -> list:
+        """
+        :param texture_dir: Root location for the texture
+        :param name: The name of this texture
+        :return: list[arcade.Texture]|arcade.Texture
+        """
+        scale = settings.get_setting('global_scale', 1.0)
+        textures = []
+
+        basic = os.path.join(texture_dir, name)
+        if os.path.isfile(basic + '.png'):
+            textures.append(arcade.load_texture(
+                basic + '.png', scale=scale
+            ))
+        elif os.path.isdir(basic):
+            for filename in sorted(os.listdir(basic)):
+                if re.match(r'^' + name + r'_[\d]+\.png$', filename):
+                    textures.append(arcade.load_texture(
+                        os.path.join(basic, filename),
+                        scale=scale
+                    ))
+
+        states = {
+            'life-static' : textures
+        }
+
+        s = TSprite(states, scale=scale)
+        return s
+
     def default_sprite(self, texture_dir: str) -> TSprite:
         """
         :return: TSprite
@@ -282,6 +326,13 @@ class _AbstractDrawObject(metaclass=PureVirtualMeta):
     def paint(self, draw_event: DrawEvent):
         """
         All classes have to overload this
+        """
+        raise NotImplementedError()
+
+    def shapes(self, draw_event: DrawEvent):
+        """
+        A function that returns arcade.shapes to enable bulk render calls
+        for hand-made components
         """
         raise NotImplementedError()
 

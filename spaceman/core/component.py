@@ -10,7 +10,7 @@ from .hardpoint import Hardpoint
 from .engine import Engine
 from .player import Player
 from .ship import Ship
-
+from .projectile import Bullet
 
 class ComponentManager(object):
     """
@@ -38,10 +38,20 @@ class ComponentManager(object):
     def engine_data(self):
         return os.path.join(self._data_path, 'components', 'engines')
 
+    @property
+    def bullet_data(self):
+        return os.path.join(self._data_path, 'components', 'bullets')
+
     def load(self):
         """
         Load any of the dynamic data we can!
         """
+        # Bullets - we just set the data directory as they're
+        # purely cosmetic (minus the hitbox established via their
+        # size) - eventually we may want to handle this information
+        # in a better way.
+        Bullet.set_data_directory(self.bullet_data)
+
         # Hardpoints
         d = self.hardpoint_data
         for hardpoint_info_file in os.listdir(d):

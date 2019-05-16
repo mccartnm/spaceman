@@ -5,6 +5,7 @@ Render tools and tech for the game
 import arcade
 
 from .abstract import _AbstractDrawObject
+from .utils import emap
 
 class RenderEngine(object):
     """
@@ -28,6 +29,12 @@ class RenderEngine(object):
         if not hasattr(self, '_render_layers'):
             self._render_layers = {} # Sprite Based
 
+        if not hasattr(self, '_widget_layers'):
+            self._widget_layers = {}
+
+        if not hasattr(self, '_cached_shapes'):
+            self._cached_shapes = {}
+
     def add_object(self, obj: _AbstractDrawObject):
         """
         Add an object to either our sprite setup or our
@@ -40,8 +47,16 @@ class RenderEngine(object):
             #
             sprite = obj._retrieve_sprite_pvt()
             self._render_layers.setdefault(
-                obj.z_depth, [arcade.SpriteList(), []]
+                obj.z_depth, [arcade.SpriteList(), [], []]
             )[0].append(sprite)
+
+        elif obj.draw_method() == _AbstractDrawObject.SHAPE_BASED:
+            #
+            # We have a function to return a list of shapes for use to draw
+            #
+            self._render_layers.setdefault(
+                obj.z_depth, [arcade.SpriteList(), [], []]
+            )[2].append(obj)
 
         else:
             #
@@ -49,7 +64,7 @@ class RenderEngine(object):
             # environment.
             #
             self._render_layers.setdefault(
-                obj.z_depth, [arcade.SpriteList(), []]
+                obj.z_depth, [arcade.SpriteList(), [], []]
             )[1].append(obj)
         obj.set_in_scene(True)
 
@@ -59,19 +74,33 @@ class RenderEngine(object):
         """
         if obj.z_depth in self._render_layers:
             if obj.draw_method() == _AbstractDrawObject.SPRITE_BASED:
-                sprite = obj._retrieve_sprite_pvt()
-                l = self._render_layers[obj.z_depth][0]
-                l.remove(sprite)
+                self._render_layers[obj.z_depth][0].remove(
+                    obj._retrieve_sprite_pvt()
+                )
+            elif obj.draw_method() == _AbstractDrawObject.SHAPE_BASED:
+                self._render_layers[obj.z_depth][2].remove(obj)
             else:
                 self._render_layers[obj.z_depth][1].remove(obj)
         obj.set_in_scene(False)
+
+
+    def add_widget(self, widget):
+        """
+        Add a widget to the game. This is 
+        """
+        self._widget_layers.setdefault(widget.z_depth, []).append(widget)
 
     def render(self, draw_event):
         """
         Main render loop
         """
+
+        #
+        # Render the game objects - Trying to render bulk where
+        # possible.
+        #
         for i in sorted(self._render_layers.keys()):
-            sprite_list, functional_draw = self._render_layers[i]
+            sprite_list, functional_draw, shape_based = self._render_layers[i]
 
             # We draw functional items first
             for f in functional_draw:
@@ -79,3 +108,40 @@ class RenderEngine(object):
 
             # The we draw the sprite list
             sprite_list.draw()
+
+            # We'll do our shapes last - in one punch
+            # shapes = arcade.ShapeElementList()
+            # for sb in shape_based:
+                # emap(lambda x: shapes.append, sb.shapes(draw_event))
+            # shapes.draw()
+
+        #
+        # The interface and other widgets render on top. This might
+        # change one day but for now - we'll just ride with this
+        #
+
+        for i in sorted(self._widget_layers.keys()):
+            widgets = self._widget_layers[i]
+
+            whash = tuple(widgets)
+            if whash in self._cached_shapes:
+
+                shapes = self._cached_shapes[whash]
+                if any(w.dirty for w in widgets):
+                    # We need a new ShapeElementList
+                    for s in shapes[:]:
+                        shapes.remove(s)
+
+                    for widget in widgets:
+                        emap(lambda x: shapes.append, widget.shapes(draw_event))
+                        widget.set_dirty(False)
+            else:
+                shapes = self._cached_shapes.setdefault(
+                    whash, arcade.ShapeElementList()
+                )
+
+                for widget in widgets:
+                    emap(shapes.append, widget.shapes(draw_event))
+                    widget.set_dirty(False)
+
+            shapes.draw()

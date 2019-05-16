@@ -213,7 +213,7 @@ class Ship(_AbstractDrawObject):
 
     # -- Overloaded update
 
-    def update(self, draw_event):
+    def update(self, delta_time):
         """
         The ship piloting logic goes in herew
         
@@ -238,11 +238,11 @@ class Ship(_AbstractDrawObject):
         s.angle = int(self._angle)
         self.set_position(Position(s.center_x, s.center_y))
 
-        super().update(draw_event)
+        super().update(delta_time)
 
         # Update all the components as well
-        emap(lambda x: x.update(draw_event), self._hardpoints)
-        emap(lambda x: x.update(draw_event), self._engines)
+        emap(lambda x: x.update(delta_time), self._hardpoints)
+        emap(lambda x: x.update(delta_time), self._engines)
 
     # -- Base Class Requirements
 
