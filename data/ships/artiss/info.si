@@ -3,26 +3,26 @@
 display_name: Artiss
 class: A
 mobile: true
-description: A light, fast ship with dual locked hardpoints
+description: A squire class ship. Medium speed and armoring, made for strafing runs in the midst of battle, en masse.
 
 hardpoints:
   - name: Left Wing Attachment
     types: [bullet, miner]
-    location: [8, 40]
+    location: [11, 29]
     direction: 0
     locked: true
     command: fire1
     default: Rattler P41
   - name: Right Wing Attachment
     types: [bullet, miner]
-    location: [55, 40]
+    location: [52, 29]
     direction: 0
     locked: true
     command: util1
     default: Rocko Miner
 
 engines:
-    - location: [31, 53]
+    - location: [31, 51]
       direction: s
       size: w
       default: Rock Hopper
