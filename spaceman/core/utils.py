@@ -144,6 +144,22 @@ class Rect(object):
             self.w = w
             self.h = h
 
+    def __iter__(self):
+        """ Allows for dynamic unpacking (e.g. *rect) """
+        for i in vars(self).values():
+            yield i
+
+    def __repr__(self):
+        return f"<(Rect, ({self.x}, {self.y}, {self.w}, {self.h}))>"
+
+    @property
+    def bottom(self):
+        return self.y + self.h
+
+    @property
+    def right(self):
+        return self.x + self.w
+
     def to_arcade_rect(self):
         """
         Python arcade uses the center of the rect to understand
@@ -153,14 +169,32 @@ class Rect(object):
         c = self.center()
         return Rect(c.x, c.y, self.w, self.h)
 
-    def center(self):
+    def center(self) -> Position:
         return Position(self.x + (self.w / 2), self.y + (self.h / 2))
 
-    def __iter__(self):
-        """ Allows for dynamic unpacking (e.g. *rect) """
-        for i in (self.x, self.y, self.w, self.h):
-            yield i
+    def moved(self, position: Position):
+        return Rect(self.x + position.x, self.y + position.y, self.w, self.h)
 
+    def move(self, position: Position):
+        self.x += position.x
+        self.y += position.y
+
+    def united(self, other):
+        """
+        :return: Rect that includes the area of both provided
+        """
+        return Rect(
+            min(self.x, other.x),
+            min(self.y, other.y),
+            max(self.right, other.right),
+            max(self.bottom, other.bottom)
+        )
+
+    def contains(self, position: Position) -> bool:
+        return (
+            self.x < position.x and (self.x + self.w) > position.x and\
+            self.h < position.y and (self.y + self.h) > position.y
+        )
 
 class Depths(object):
     """
@@ -187,3 +221,14 @@ class FPSCounter(object):
             return 0
         else:
             return len(self.frame_times) / sum(self.frame_times)
+
+
+class MouseEvent(object):
+    """
+    General mouse event
+    """
+    def __init__(self, x, y, button, modifiers):
+        self.x = x
+        self.y = y
+        self.button = button
+        self.modifiers = modifiers

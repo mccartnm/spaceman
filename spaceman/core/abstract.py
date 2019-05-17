@@ -150,6 +150,14 @@ class _AbstractDrawObject(metaclass=PureVirtualMeta):
     def sprite(self):
         return self._retrieve_sprite_pvt()
 
+    def data_directory(self) -> str:
+        """
+        :return: The root of our data path containing any game data
+        that we may need
+        """
+        from .render import RenderEngine
+        return RenderEngine().data_directory()
+
     def add_to_scene(self):
         """
         This this object to our scene at the given depth
@@ -196,7 +204,7 @@ class _AbstractDrawObject(metaclass=PureVirtualMeta):
         Set the speed at which this object is traveling (if any)
         """
         self._velocity = velocty
-        if self.draw_method() == _AbstractDrawObject.SPRITE_BASED:
+        if self.draw_method() & _AbstractDrawObject.SPRITE_BASED:
             self.sprite().change_x = velocty.x
             self.sprite().change_y = velocty.y
 
@@ -256,13 +264,14 @@ class _AbstractDrawObject(metaclass=PureVirtualMeta):
 
         return states
 
-    def load_basic(self, texture_dir: str, name: str) -> list:
+    def load_basic(self, texture_dir: str, name: str, scale: (int, float) = None) -> list:
         """
         :param texture_dir: Root location for the texture
         :param name: The name of this texture
         :return: list[arcade.Texture]|arcade.Texture
         """
-        scale = settings.get_setting('global_scale', 1.0)
+        if scale is None:
+            scale = settings.get_setting('global_scale', 1.0)
         textures = []
 
         basic = os.path.join(texture_dir, name)
@@ -343,5 +352,5 @@ class _AbstractDrawObject(metaclass=PureVirtualMeta):
         :param delta_time: float of time passed sincle the last update
         :return: None
         """
-        if self.draw_method() == _AbstractDrawObject.SPRITE_BASED:
+        if self.draw_method() & _AbstractDrawObject.SPRITE_BASED:
             self.sprite().update()

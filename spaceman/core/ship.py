@@ -8,10 +8,12 @@ import yaml
 import arcade
 import functools
 
+from .tobject import TSignal, TObject
 from .abstract import _AbstractDrawObject, TSprite
 from .hardpoint import Hardpoint
 from .engine import Engine
-from .utils import _must_contain, Position, emap
+from .damage import Damage
+from .utils import _must_contain, Position, emap, _clamp
 from . import settings
 
 class ShipHardpoint(object):
@@ -84,7 +86,7 @@ class ShipEngine(object):
         return self._engine
 
 
-class Ship(_AbstractDrawObject):
+class Ship(TObject, _AbstractDrawObject):
     """
     A component that can float/fly in space, has health, can be destroyed,
     and other fun stuff!
@@ -101,13 +103,16 @@ class Ship(_AbstractDrawObject):
         'D' : 4,
     }
 
+    # -- Known - buildable prototypes of our ships
     _ship_prototypes = {}
 
     def __init__(self, ship_info):
         """
         Building a ship takes a good chunk of information
         """
-        super().__init__()
+
+        TObject.__init__(self)
+        _AbstractDrawObject.__init__(self)
 
         # All the defaults
         self._display_name = ship_info['display_name']
@@ -117,6 +122,9 @@ class Ship(_AbstractDrawObject):
         self._hull         = ship_info['hull']
         self._shield       = ship_info['shield']
         self._fuel         = ship_info['fuel']
+
+        self._hull_max     = ship_info['hull']
+        self._shield_max   = ship_info['shield']
 
         self._hardpoints = [
             ShipHardpoint(x, self) for x in ship_info.get('hardpoints', [])
@@ -154,6 +162,14 @@ class Ship(_AbstractDrawObject):
         return self._hull
 
     @property
+    def hull_max(self):
+        return self._hull_max
+    
+    @property
+    def shield_max(self):
+        return self._shield_max
+
+    @property
     def shield(self):
         return self._shield
 
@@ -166,6 +182,16 @@ class Ship(_AbstractDrawObject):
         return self._angle
 
     # -- More typical gameplay controls
+
+    @TSignal
+    def take_damage(self, damage: Damage):
+        """
+        Whenever the ship takes a select amount of damage
+        """
+        if self._shield > 0:
+            self._shield = max(0, self._shield - damage.amount)
+        else:
+            self._hull = max(0, self._hull - damage.amount)
 
     def fire_command(self, command):
         """

@@ -9,6 +9,7 @@ from .engine import Engine
 from .player import Player
 from .ship import Ship
 
+from .tobject import TObject, TSignal
 from .abstract import DrawEvent
 from .utils import Position, FPSCounter
 from .render import RenderEngine
@@ -16,16 +17,24 @@ from .campaign import CampaignLoader, Campaign
 from .component import ComponentManager
 
 from ..interface.user import UserInterface
+from ..interface.iabstract import _TWidgetManager
 
 DEV_MODE = True
 ONCE_FLAG = False
 
-class Spaceman(arcade.Window):
+class Spaceman(TObject, arcade.Window):
     """
     The main window y'all!
     """
     def __init__(self, w, h, title):
-        super().__init__(w, h, title)
+        TObject.__init__(self)
+        arcade.Window.__init__(self, w, h, title)
+
+        #
+        # Widget manager started first to assert other widgets
+        # will be created properly
+        #
+        _TWidgetManager.set_window(self)
 
         #
         # Boot happens in a few steps
@@ -46,6 +55,10 @@ class Spaceman(arcade.Window):
             'data'
         )
 
+        # Get the render engine
+        self._render_engine = RenderEngine()
+        self._render_engine.set_data_directory(self._data_path)
+
         self._component_manager = ComponentManager(self._data_path)
 
         # Initial information
@@ -61,9 +74,6 @@ class Spaceman(arcade.Window):
 
         # The interface for the user's current health and otherwise
         self._interface = UserInterface(self._player)
-
-        # Get the render engine
-        self._render_engine = RenderEngine()
 
         if DEV_MODE:
             self._fps = FPSCounter()
@@ -104,9 +114,29 @@ class Spaceman(arcade.Window):
         if self._player.on_key_release(key, modifiers):
             return
 
+    @TSignal
     def on_mouse_motion(self, x, y, dx, dy):
+        """
+        When the user moves their mouse, what sould we do?
+        """
         self._mouse_position = Position(x, y)
         self._mouse_delta = Position(dx, dy)
+
+    @TSignal
+    def on_mouse_press(self, x, y, button, modifiers):
+        """
+        When the user presses the mouse down, we attempt to feed that information
+        to our various listeners
+        """
+        pass # TSignal will do the heavy lifting
+
+    @TSignal
+    def on_mouse_release(self, x, y, button, modifiers):
+        """
+        When the user releases the mouse, we attempt to feed that information
+        to our various listeners
+        """
+        pass # TSignal will do the heavy lifting
 
     def on_draw(self):
         """

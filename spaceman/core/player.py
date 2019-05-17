@@ -4,13 +4,17 @@ import arcade
 from . import inventory
 from .ship import Ship
 from .utils import Position
+from .damage import Damage
+from .tobject import TObject, TSignal
 
-class Player(object):
+class Player(TObject):
     """
-    The player attributes!
+    The player itself!
     """
 
     def __init__(self):
+        super().__init__()
+
         self._ship = None
         self._inventory = inventory.PlayerInventory()
 
@@ -35,7 +39,28 @@ class Player(object):
         """
         Set the players active ship
         """
+        if self._ship:
+            self._ship.stop_listening(self.ship_took_damage)
+
         self._ship = ship
+        self._ship.take_damage.listen_post(
+            self.ship_took_damage
+        )
+
+        # To reset any interfaces
+        self.ship_took_damage(Damage('null'))
+
+    @TSignal
+    def ship_took_damage(self, damage: Damage):
+        """
+        A player takes damage whenever they're hit by an
+        ememy projectile
+        
+        - For the moment, this is just for others to listen to
+        without the need to extend a connection to each ship
+        if the player changes said ship
+        """
+        pass
 
     def on_key_press(self, key, modifiers):
         """
@@ -75,6 +100,9 @@ class Player(object):
             self.ship.fire_command('fire1')
         elif key >= arcade.key.KEY_1 and key <= arcade.key.KEY_9:
             self.ship.fire_command(f'util{key - arcade.key.KEY_0}')
+
+        elif key == arcade.key.I:
+            self.ship.take_damage(Damage(Damage.PIERCE, 100))
 
         else:
             consumed = False
