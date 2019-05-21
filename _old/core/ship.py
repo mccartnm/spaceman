@@ -242,7 +242,6 @@ class Ship(TObject, _AbstractDrawObject):
     def update(self, delta_time):
         """
         The ship piloting logic goes in herew
-        
         :note: We work in 2 dimentions with nealy everything here
         """
         self._speed.drag_calculation(self._drag)

@@ -69,6 +69,7 @@ class Position(object):
     def __mul__(self, other: (int, float, T)) -> T:
         """ Multiplication """
         if isinstance(other, Position):
+            # dot product really...
             return Position(self.x * other.x, self.y * other.y)
         return Position(self.x * other, self.y * other)
         
