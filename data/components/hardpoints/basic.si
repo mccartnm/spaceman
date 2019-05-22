@@ -6,11 +6,11 @@
   type: bullet
   props:
     sprite: basic_bullet
-    automatic: false
-  range: 350
+    automatic: true
+  range: 500
   ammo: null
   damage: 120
-  rate: 10
+  rate: 5
 
 - name: Rocko Miner
   description: |

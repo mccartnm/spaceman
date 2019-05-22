@@ -1,15 +1,14 @@
 extends Node
 
 const utils = preload("../utils.gd");
+const Engine_ = preload("../engines.gd");
+const Ship = preload("../ship.gd");
 
 var WIDE: String = "w";
 var THIN: String = "t";
 var CARDINALS: Array = ['n', 's', 'e', 'w'];
 
 var _engine_prototypes: Dictionary = {};
-
-func _ready():
-    pass # Nothing be default
 
 static func verify_ship_engine(engine_info: Dictionary, errors: Array, obj):
     """
@@ -61,6 +60,14 @@ static func verify_ship_engine(engine_info: Dictionary, errors: Array, obj):
         errors.append(
             "Engine size must be one of: " + utils.join(sizes, ', ')
         );
+
+func new_engine(name: String, ship_eg_info: Dictionary, ship: Ship) -> Engine_:
+    """
+    Create a new hardpoint instance to place on a ship
+    """
+    if not _engine_prototypes.has(name):
+        return null;
+    return Engine_.new(_engine_prototypes[name], ship_eg_info, ship);
 
 func add_prototypes(filename: String):
     """
