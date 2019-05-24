@@ -2,7 +2,7 @@
 Main entry point for the game. Based on the current settings,
 we may have this do different things.
 """
-extends Node2D
+extends Node
 
 # -- Imports
 const CampaignLoader = preload("campaign.gd");

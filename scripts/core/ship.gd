@@ -1,5 +1,11 @@
 extends KinematicBody2D
 
+# -- Signals
+signal ship_health_changed;
+signal ship_hardpoints_changed;
+signal ship_engines_changed;
+signal ship_location_changed;
+
 # -- Imports
 const ShipHardpoint = preload("components/ship_hardpoint.gd");
 const ShipEngine    = preload("components/ship_engine.gd");
@@ -20,6 +26,16 @@ var _thrust: Vector2;
 var _speed: Vector2;
 var _drag: Vector2 = Vector2(0.8, 0.8);
 var _angle_delta: float;
+
+# Visibility
+var _camera: Camera2D;
+var _active: bool = false;
+
+# Health
+var _hull: float;
+var _shield: float;
+var _max_hull: float;
+var _max_shield: float;
 
 # -- Public Methods
 
@@ -68,6 +84,22 @@ func max_speed() -> float:
 func class_() -> String:
     return _info['class'];
 
+func follow():
+    """
+    Enable a camera on this ship and follow them about!
+    
+    Typically this is used for the player but could also proove useful
+    for cutscenes and things like that
+    """
+    if not _camera:
+        _camera = Camera2D.new();
+        add_child(_camera);
+    
+    _camera.current = true;
+    _camera.smoothing_enabled = true;
+    _camera.smoothing_speed = 5;
+    _active = true;
+
 # -- Private Methods
 
 func _init(ship_info: Dictionary):
@@ -81,6 +113,12 @@ func _init(ship_info: Dictionary):
     _speed = Vector2(0, 0);
     _thrust = Vector2(0, 0);
     _angle_delta = 0;
+    
+    _hull = _info['hull'];
+    _max_hull = _info['hull'];
+
+    _shield = _info['shield'];
+    _max_shield = _info['shield'];
 
     for hp_info in _info["hardpoints"]:
         _hardpoints.push_back(ShipHardpoint.new(hp_info, self));
@@ -112,7 +150,7 @@ func _physics_process(delta):
     Every tick, make sure we're in the right location
     """
     _speed = _drag_calculation(_speed);
-    _speed += _thrust * 10;
+    _speed += _thrust    * 10; # Weird constants...
     var ms = max_speed() * 50;
     _speed.x = clamp(_speed.x, -ms, ms);
     _speed.y = clamp(_speed.y, -ms, ms);
@@ -121,10 +159,14 @@ func _physics_process(delta):
     var new_angle = get_rotation() + rad_angle;
     set_rotation(new_angle);
 
+    var current_pos = global_position;
+
     var change = _speed * 50;
     change = change.rotated(new_angle);
     move_and_slide(change * delta);
 
+    if _active and global_position != current_pos:
+        emit_signal("ship_location_changed");
 
 func _ready():
     add_child(_sprite);

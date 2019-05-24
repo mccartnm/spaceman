@@ -11,6 +11,8 @@ const Bullet = preload("../../scenes/projectile/bullet_function.tscn");
 # -- Members
 var _info: Dictionary;
 var _ship_info: Dictionary;
+var _audio_player: AudioStreamPlayer2D;
+var _loaded_stream: AudioStream;
 var _ship;
 
 # Additional tools

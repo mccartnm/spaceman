@@ -1,12 +1,14 @@
 extends Node2D
 
-var STAR_COUNT = 200.0;
+var STAR_COUNT = 10000.0;
+var MAP_SIZE = Vector2(8000, 8000); # FIXME: Needs to be relative
 var _density = 1.0;
 
 #
 # We build a collection of stars to render for the user. This makes
 # it easy to show a "space-like" vision.
 #
+
 func _ready():
     """
     We connect to the resize of the viewport to make sure the stars
@@ -15,6 +17,7 @@ func _ready():
     get_tree().get_root().connect("size_changed", self, "_build_star_layout");
     set_z_index(-100);
     _build_star_layout();
+
 
 func _build_star_layout():
     """
@@ -25,8 +28,7 @@ func _build_star_layout():
 
     var total_stars = int(STAR_COUNT * _density);
     var upper_third = int(total_stars / 3);
-    var viewport = get_viewport();
-    var screen = Vector2(viewport.size.x, viewport.size.y);
+    var screen = MAP_SIZE;
 
     var texture = load("res://data/objects/space/star.png");
     for i in range(total_stars):
@@ -38,7 +40,7 @@ func _build_star_layout():
         node.set_name("star_me_" + str(i));
         node.set_texture(texture);
         node.position = Vector2(
-            rand_range(0, screen.x),
-            rand_range(0, screen.y)
+            rand_range(-screen.x, screen.x),
+            rand_range(-screen.y, screen.y)
         );
         add_child(node);

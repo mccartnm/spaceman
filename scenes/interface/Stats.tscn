@@ -1,0 +1,33 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://data/objects/interface/notif_dull.png" type="Texture" id=1]
+
+[node name="Stats" type="MarginContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/margin_right = 10
+custom_constants/margin_top = 10
+custom_constants/margin_left = 10
+custom_constants/margin_bottom = 10
+
+[node name="MainContainer" type="HBoxContainer" parent="."]
+editor/display_folded = true
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 1014.0
+margin_bottom = 590.0
+
+[node name="HealthAndEnergy" type="HBoxContainer" parent="MainContainer"]
+margin_right = 936.0
+margin_bottom = 580.0
+size_flags_horizontal = 3
+
+[node name="InfoAndNotif" type="HBoxContainer" parent="MainContainer"]
+margin_left = 940.0
+margin_right = 1004.0
+margin_bottom = 580.0
+
+[node name="Notification" type="TextureButton" parent="MainContainer/InfoAndNotif"]
+margin_right = 64.0
+margin_bottom = 580.0
+texture_normal = ExtResource( 1 )
