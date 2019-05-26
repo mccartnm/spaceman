@@ -6,11 +6,11 @@ extends Node
 
 # -- Imports
 const Player = preload("player.gd");
-const Space  = preload("space.gd");
+const Space  = preload("res://scenes/space.tscn");
 const Stats  = preload("res://scenes/interface/Stats.tscn");
 const Active = preload("res://scenes/interface/ActiveItems.tscn");
 
-const Aster = preload("res://scenes/objects/Asteroid_Small.tscn");
+const StarGate = preload("res://scenes/objects/StarGate_Small.tscn");
 
 func _init_player_interface():
     """
@@ -29,12 +29,17 @@ func _basic_start(player: Player):
     """
     var r = get_node("/root/GAME");
 
-    var ship = PrototypeLoader.SHIPS.new_ship("Lamella", Vector2(0, 0));
+    var ship = PrototypeLoader.SHIPS.new_ship("Skalk", Vector2(0, 0));
     ship.set_z_index(0);
     ship.follow();
     player.set_ship(ship);
 
-    r.add_child(Space.new()); #< Give us some space love
+    var sg = StarGate.instance();
+    sg.boot("alpha");
+    sg.global_position = Vector2(-400, -1000);
+    r.add_child(sg);
+
+    r.add_child(Space.instance()); #< Give us some space love
     r.add_child(ship);        #< Bring the ship up (Move this)
 
     _init_player_interface();

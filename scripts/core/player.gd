@@ -33,7 +33,12 @@ func ship() -> Ship:
     
 func set_ship(ship: Ship):
     _ship = ship;
+    _ship.set_player(self);
+    _ship.set_collision_layer(4);
     emit_signal("ship_changed");
+
+func set_can_control(can_control: bool):
+    _can_control = can_control;
 
 # -- Private Methods
 

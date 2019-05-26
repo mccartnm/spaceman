@@ -1,0 +1,137 @@
+....................................................
+[Legend]
+#      = comment - something to think about
+---... = Break in time of some sort
+***    = Where the actual game begins
+....................................................
+
+# Alpha Tango Games Presents...
+
+Tomes of Malloc (don't know yet)
+---------------
+
+Story Concept:
+
+A young Dr. John Malloc, a famous pilot and astrophysicist, came to a revelation in time manipulation by folding space. With this knowledge builds the first "time capsule". This was a sprawling complex of technology. Unlike anything man had ever built. Capable of sustaining life for years to come - and with a purpose.
+
+But it's important to remember the first - and only - rule of time:
+
+    You cannot go back.
+
+It will never be done. But! there's no such rule for slowing it down.
+
+The time capsule is not meant to send it's user back in time - or forward for that matter - but rather to grant those _outside_ of the capsule solutions of the future.
+
+When one steps inside - hours, days, months will pass while those anywhere else in the universe have only experienced minutes. As Einstein teaches - Relativity is a powerful thing.
+
+    > "We've waited for the future long enough. We must bring it to us."
+        - Dr. John Malloc
+
+With this new, astounding technology, and a platform to exercise it, a call went out to the greatest minds the world over. The mission was simple:
+
+    Save the lives of those around you by giving your life to the first truly powerful cause.
+
+Without hesitation scientists, engineers, mathematicians and artists the world over signed away their life to advanced the human race in record time. To solve climate crisis, medical research, quantum technologies, fundamental thermodynamic limitations, 500 men and women were selected for the task.
+
+Powered by the world's three fusion reactors, it had to produce enough power to be consumed by those using it - within _their_ relative time.
+
+And to everyones awe and amazement...
+
+    It worked.
+
+After spending nearly 100 years within the capsule, about 3 days in "real" time, they emerged with what would be known as the Tomes of Malloc. A quantum leap in all forms of science and technology. Robotics, AI, biochemical research, genetic augmentation, you name it.
+
+Those who were roughly under the age of 35 when they entered and survived the first 20 years, although 135+ years old, looked as though they were capable of running marathons. Their research paved the way to medical treatments that could keep humans alive for generations.
+
+This new future tech made the current world seem medieval.
+
+Everything paled in comparison to one discovery in particular:
+
+    The Jump Gate Paradigm.
+
+Now, not only did we have definitive proof that space-time could be warped, but it could be done with a bridge between it. We could explore and expand far beyond our small corner of the universe.
+
+Problems that were halting the world could be solved simply with the Tomes. They became s religion as less capable minds saw them as God's words.
+
+The stars among us became obtainable and we waisted no time cultivating these worlds.
+
+-----------------------------------------------------
+
+But, as with all ages of our kind, there comes a tragic period.
+
+We began waging war not on a small spec of dust suspended in a sunbeam, but instead at a galactic scale. There was no stopping it.
+
+Factions grew and hatred boiled unto the War of Death. Violence beyond measure.
+
+... # TO DO : Fill this out more - get brutal with the details and flush out possible factions.
+
+------------------------------------------------------
+
+# Fast forward ~150 years
+
+After years of turmoil, a loose armistice is signed, and the turmoil slows to a shadow looming over the daily lives of everyone - everywhere.
+
+***
+
+The users' story opens on a large ship and pans to two small mining vessels. You find out one is yours and the other is your mentor and long time friend Lance Park. He's finally getting you out of the classroom and into a cockpit.
+
+Your crew, a scientist, and an engineer, who are other acolytes of Lance, take off after a quick discussion with you.
+
+You undock and head towards the nearest JumpGate. After blasting through it to a nearby asteroid belt, you learn the basic controls behind a ship and how to take care of it.
+
+Lance teaches basic resource collection, combat, ship power management, and other such helpful hints to get you used to the pilots position. The AI powering your factions fleet, known as BOT - chimes in from time to time as well.
+
+You eventually head back to through the JumpGate and follow Lance through.
+
+Upon arriving at your faction's local space, Lance is nowhere to be found - and the camera pans out to show your factions capital ship burning. Screams of your people come through your comms
+
+You race to reach your crew, who are at the edge of the chaos. Before you can say anything, Lance yells:
+
+    "BOT. Get them out of here! Protocol: Alpha Tango 4-6-3"
+
+With that the camera starts to shake and you feel the universe stretch around you (not sure about this yet but the idea is there). As your fading out you manage to scream into the comms:
+
+    "Lance!!!"
+
+Everything goes black.
+
+-----------------------------------------------------
+
+The title of the game appears slowly...
+
+Fading to black, the text "One Week Later" is shown.
+
+While still a black screen:
+
+You: "Where- where am I?"
+
+BOT: "You're in Cryo Chamber 1 aboard the SS Alpha. Possibly last remnants of the <user selected faction name>."
+
+You: "What happened? What is happening?"
+
+BOT: "Currently I can only relay some information. We are running at minimum power and critical life support. I cannot bring your colleagues out of stasis until more resources are procured."
+
+You: "Fuck... This is crazy. What _do_ we have?"
+
+The scene slowly fades in - showing a small space station and docked ship.
+
+BOT: "We have a T51 docked and what little sensor data I have shows some basic materials may be close by."
+
+You undock the ship and proceed to collect some materials, powering up the ship. While doing so you ask about Lance.
+
+BOT: "I'm sorry <your name>. It's unlikely that Lance survived the turmoil. We are also not allowed to dispatch and messages for it would risk exposure."
+
+------------------------------------------------------ < IN GAME LEARNING AND GETTING TEAM OUT OF CRYO
+
+After your team is up, you start the meat of the campaign, which is to find out what the fuck it happening and what really happened to Lance.
+
+
+-------- SPOILERS/IDEAS THAT MAY/WILL CHANGE!
+
+Lance is really Dr. Malloc - He started a "new life" with the medical technology from the Capsule and was hiding his mind from the universe where possible.
+
+The true villains is one of the authors of the Tomes of Malloc - as he wanted to exploit the mind of Malloc for years using said technology.
+
+The result is Super Capital Ship "powered" by the mind of Dr. Malloc - he is forces to become the ship and is twisted by the horrid technology, consuming worlds and peoples.
+
+This leads us to the story arch of battling it out with not only this evil faction, but also the person who made you who you are. The sacrifices required will be daunting.

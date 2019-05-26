@@ -1,5 +1,7 @@
 extends KinematicBody2D
 
+class_name ShipBase, "res://data/ships/skalk/life/static.png"
+
 # -- Signals
 signal ship_health_changed;
 signal ship_hardpoints_changed;
@@ -37,13 +39,24 @@ var _shield: float;
 var _max_hull: float;
 var _max_shield: float;
 
+# Pointers
+var _player;
+
 # -- Public Methods
+
+func set_player(player):
+    _player = player;
+    
+func player():
+    return _player;
 
 func set_thrust(thrust: Vector2):
     _thrust = thrust;
     for engine in _engines:
         engine.check_state(_thrust);
 
+func set_speed(speed: Vector2):
+    _speed = speed;
 
 func get_current_size() -> Vector2:
     return Vector2(64, 64);
@@ -100,9 +113,9 @@ func follow():
     _camera.smoothing_speed = 5;
     _active = true;
 
-# -- Private Methods
+# -- Protected Methods
 
-func _init(ship_info: Dictionary):
+func boot(ship_info: Dictionary):
     """
     Construct a ship!
     """
@@ -128,6 +141,7 @@ func _init(ship_info: Dictionary):
     _data_location = _info['data_directory'];
     _sprite = TSprite.new(_data_location, TSprite.AnimationLoadType.Ship);
 
+# -- Protected Methods
 
 func _drag_calculation(vec: Vector2) -> Vector2:
     """
@@ -161,9 +175,12 @@ func _physics_process(delta):
 
     var current_pos = global_position;
 
-    var change = _speed * 50;
+    var change = _speed;
     change = change.rotated(new_angle);
-    move_and_slide(change * delta);
+
+    var collision = move_and_collide(change * delta);
+    if collision and collision.collider.has_method("ship_collision"):
+        collision.collider.ship_collision(self)
 
     if _active and global_position != current_pos:
         emit_signal("ship_location_changed");

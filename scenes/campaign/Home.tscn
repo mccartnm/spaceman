@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://scripts/campaign/home.gd" type="Script" id=1]
+[ext_resource path="res://data/stations/alpha/alpha_base_a.png" type="Texture" id=2]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 12.347, 11.1663 )
+
+[sub_resource type="CapsuleShape2D" id=2]
+radius = 52.1578
+height = 2.92154
+
+[node name="Home" type="Node2D"]
+script = ExtResource( 1 )
+
+[node name="StationRoot" type="StaticBody2D" parent="."]
+position = Vector2( 294.295, 103.156 )
+scale = Vector2( 2, 2 )
+
+[node name="Station" type="Sprite" parent="StationRoot"]
+texture = ExtResource( 2 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StationRoot"]
+position = Vector2( -51.1314, -3.01884 )
+shape = SubResource( 1 )
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StationRoot"]
+position = Vector2( 11.8866, -0.566025 )
+shape = SubResource( 2 )
+
+[node name="dock" type="Node2D" parent="StationRoot"]
+position = Vector2( -63.29, -2.46 )

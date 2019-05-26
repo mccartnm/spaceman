@@ -1,2 +1,7 @@
 *.pyc
 .DS_STORE
+Properties/*
+.mono/*
+.import/*
+*.sln
+*.csproj

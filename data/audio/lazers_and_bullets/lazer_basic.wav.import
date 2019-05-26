@@ -11,7 +11,7 @@ dest_files=[ "res://.import/lazer_basic.wav-d7fcf888651be7b68db6df05613b3c42.sam
 
 [params]
 
-force/8_bit=false
+force/8_bit=true
 force/mono=false
 force/max_rate=false
 force/max_rate_hz=44100

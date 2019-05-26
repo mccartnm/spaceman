@@ -39,8 +39,8 @@ func start(
     _traveled = 0;
 
     # Give ourselves a little sound
-    _audio_player = get_node("AudioStreamPlayer2D");
-    _audio_player.play(0.1); # ??
+    #_audio_player = get_node("AudioStreamPlayer2D");
+    #_audio_player.play(0.1); # ??
 
 func _physics_process(delta):
     """
@@ -58,7 +58,8 @@ func _physics_process(delta):
             collision.collider.hit(_damage)
 
         # -- Currently, anything we collide with, we're going
-        # to destroy outselves on
+        # to destroy outselves on - this may change depending
+        # on hardpoint properties but for now, this'll do
         queue_free();
 
 func _on_VisibilityNotifier2D_screen_exited():

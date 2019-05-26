@@ -12,6 +12,7 @@ const utils = preload("utils.gd");
 enum AnimationLoadType {
     Ship,
     Component,
+    Stargate,
     Custom
 };
 
@@ -60,6 +61,8 @@ func _init(data_directory: String, load_type, name: String = ""):
             _load_ship_sprites(data_directory);
         AnimationLoadType.Component:
             _load_component_sprites(data_directory, name);
+        AnimationLoadType.Stargate:
+            _load_ship_sprites(data_directory);
         AnimationLoadType.Custom:
             pass
     set_sprite_frames(_states);
@@ -82,7 +85,6 @@ func _load_ship_sprites(data_directory: String):
         )
         textures.sort();
 
-        var animations := {};
         for texture in textures:
             #
             # For each of the textures found, attmept to build out any

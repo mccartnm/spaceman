@@ -4,7 +4,6 @@ extends Node
 const utils = preload("../utils.gd");
 const HardpointPrototypes = preload("hardpoint_proto.gd");
 const EnginePrototypes = preload("engine_proto.gd");
-const Ship = preload("res://scripts/core/ship.gd");
 
 var WEIGHT_CLASS: Dictionary = {
     'A' : 1,
@@ -15,14 +14,18 @@ var WEIGHT_CLASS: Dictionary = {
 
 var _ship_prototypes: Dictionary = {};
 
-func new_ship(name: String, position: Vector2) -> Ship:
+func new_ship(name: String, position: Vector2):
     """
     Generate a new ship based on the required
     """
     if not _ship_prototypes.has(name):
         return null;
 
-    var s = Ship.new(_ship_prototypes[name]);
+    var ship_scene = load("res://data/ships/{}/{}.tscn".format(
+        [name.to_lower(), name.to_lower()], "{}"
+    ));
+    var s = ship_scene.instance();
+    s.boot(_ship_prototypes[name]);
     s.set_position(position);
     return s;
 
