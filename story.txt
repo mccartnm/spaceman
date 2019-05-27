@@ -119,7 +119,7 @@ BOT: "We have a T51 docked and what little sensor data I have shows some basic m
 
 You undock the ship and proceed to collect some materials, powering up the ship. While doing so you ask about Lance.
 
-BOT: "I'm sorry <your name>. It's unlikely that Lance survived the turmoil. We are also not allowed to dispatch and messages for it would risk exposure."
+BOT: "I'm sorry <your name>. It's unlikely that Lance survived the turmoil. We are also not allowed to dispatch any messages for it would risk exposure."
 
 ------------------------------------------------------ < IN GAME LEARNING AND GETTING TEAM OUT OF CRYO
 
@@ -132,6 +132,6 @@ Lance is really Dr. Malloc - He started a "new life" with the medical technology
 
 The true villains is one of the authors of the Tomes of Malloc - as he wanted to exploit the mind of Malloc for years using said technology.
 
-The result is Super Capital Ship "powered" by the mind of Dr. Malloc - he is forces to become the ship and is twisted by the horrid technology, consuming worlds and peoples.
+The result is Super Capital Ship "powered" by the mind of Dr. Malloc - he is forced to become the ship and is twisted by the horrid technology, consuming worlds and peoples.
 
 This leads us to the story arch of battling it out with not only this evil faction, but also the person who made you who you are. The sacrifices required will be daunting.

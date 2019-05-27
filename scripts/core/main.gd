@@ -23,4 +23,4 @@ func _ready():
     add_child(_campaign_loader);
 
     if DEV_MODE:
-        _campaign_loader._basic_start(_player);
+        _campaign_loader.player_start(_player);

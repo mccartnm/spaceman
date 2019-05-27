@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/face_holo010.png-d1af9db8ddc278b8b0906db878696df3.stex"
+path="res://.import/life_module_small2.png-b5b356b77e2edeb78177939a2a788749.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://data/objects/interface/pilot_face_hologram/face_holo010.png"
-dest_files=[ "res://.import/face_holo010.png-d1af9db8ddc278b8b0906db878696df3.stex" ]
+source_file="res://data/stations/general/gen_life_module_small/life_module_small2.png"
+dest_files=[ "res://.import/life_module_small2.png-b5b356b77e2edeb78177939a2a788749.stex" ]
 
 [params]
 

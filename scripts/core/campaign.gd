@@ -10,7 +10,7 @@ const Space  = preload("res://scenes/space.tscn");
 const Stats  = preload("res://scenes/interface/Stats.tscn");
 const Active = preload("res://scenes/interface/ActiveItems.tscn");
 
-const StarGate = preload("res://scenes/objects/StarGate_Small.tscn");
+const Home = preload("res://scenes/campaign/Home.tscn");
 
 func _init_player_interface():
     """
@@ -19,11 +19,11 @@ func _init_player_interface():
     var r = get_node("/root/GAME/ui");
 #    var stats = Stats.instance();
 #    r.add_child(stats);
-
     var items = Active.instance();
     r.add_child(items);
 
-func _basic_start(player: Player):
+
+func player_start(player: Player):
     """
     Development starter pack
     """
@@ -34,15 +34,17 @@ func _basic_start(player: Player):
     ship.follow();
     player.set_ship(ship);
 
-    var sg = StarGate.instance();
-    sg.boot("alpha");
-    sg.global_position = Vector2(-400, -1000);
-    r.add_child(sg);
-
     r.add_child(Space.instance()); #< Give us some space love
     r.add_child(ship);        #< Bring the ship up (Move this)
 
-    _init_player_interface();
+    var home_base = Home.instance();
+    r.add_child(home_base);
+
+    # -- Once we have our home base added to the
+    # world - it's time to 
+    home_base.from_json({
+        "stargate" : "alpha"
+    });
 
 func _ready():
-    pass
+    _init_player_interface();

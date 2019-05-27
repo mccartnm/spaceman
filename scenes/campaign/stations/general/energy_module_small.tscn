@@ -1,0 +1,39 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://scripts/campaign/station_component.gd" type="Script" id=1]
+[ext_resource path="res://data/stations/general/gen_enery_module_small/gen_energy_module_small_0.png" type="Texture" id=2]
+[ext_resource path="res://data/stations/general/gen_enery_module_small/gen_energy_module_small_1.png" type="Texture" id=3]
+[ext_resource path="res://data/stations/general/gen_enery_module_small/gen_energy_module_small_2.png" type="Texture" id=4]
+[ext_resource path="res://data/stations/general/gen_enery_module_small/gen_energy_module_small_3.png" type="Texture" id=5]
+[ext_resource path="res://data/stations/general/gen_enery_module_small/gen_energy_module_small_4.png" type="Texture" id=6]
+[ext_resource path="res://data/stations/general/gen_enery_module_small/gen_energy_module_small_5.png" type="Texture" id=7]
+
+[sub_resource type="SpriteFrames" id=1]
+animations = [ {
+"frames": [ ExtResource( 2 ), ExtResource( 3 ), ExtResource( 4 ), ExtResource( 5 ), ExtResource( 6 ), ExtResource( 7 ) ],
+"loop": true,
+"name": "default",
+"speed": 0.6
+} ]
+
+[sub_resource type="CircleShape2D" id=2]
+radius = 7.64429
+
+[node name="StationComponent" type="StaticBody2D"]
+script = ExtResource( 1 )
+_energy = 5.0
+_general = true
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="."]
+frames = SubResource( 1 )
+frame = 5
+playing = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( 0.427891, 0.0916901 )
+shape = SubResource( 2 )
+
+[node name="mounts" type="Node2D" parent="."]
+
+[node name="mount_b_0" type="Node2D" parent="mounts"]
+position = Vector2( 1, 2 )
